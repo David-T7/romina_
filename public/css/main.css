@@ -663,7 +663,7 @@ button {
 
 
 .about-section {
-    padding: clamp(80px, 10vw, 140px) 0 clamp(80px, 10vw, 120px);
+    padding: clamp(20px, 3vw, 40px) 0 clamp(80px, 10vw, 120px);
     background: var(--white);
 }
 
@@ -674,18 +674,18 @@ button {
     display: grid;
     grid-template-columns: 1.05fr 1fr;
     gap: clamp(40px, 7vw, 120px);
-    align-items: end;
+    align-items: start;
 }
 
 
 .about-mark {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 
     color: var(--red);
 
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 700;
     letter-spacing: 2.5px;
     text-transform: uppercase;
@@ -705,24 +705,25 @@ button {
 
     color: var(--deep-blue);
 
-    font-size: clamp(34px, 4vw, 58px);
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -1.5px;
+    font-size: clamp(34px, 4.6vw, 66px);
+    font-weight: 300;
+    line-height: 1.04;
+    letter-spacing: -.022em;
+    max-width: 18ch;
 }
 
 
 .about-copy {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 6px;
     padding-bottom: 6px;
 }
 
 
 .amh {
-    font-size: 18px;
-    font-weight: 400;
+    font-size: 20px;
+    font-weight: 500;
     color: var(--red);
     letter-spacing: .5px;
 }
@@ -748,7 +749,7 @@ button {
 /* --- timeline --- */
 
 .tl {
-    margin-top: clamp(72px, 9vw, 120px);
+    margin-top: clamp(36px, 5vw, 60px);
 }
 
 
