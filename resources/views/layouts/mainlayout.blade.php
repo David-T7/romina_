@@ -35,6 +35,8 @@
 
 @include('partials.who-we-are')
 
+@include('partials.portfolio')
+
 @include('partials.culture')
 
 @include('partials.executive-team')
@@ -42,8 +44,6 @@
 @include('partials.businesses')
 
 @include('partials.sustainability')
-
-@include('partials.portfolio')
 
 @include('partials.footer')
 
@@ -88,6 +88,50 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 /* =====================================================
+   FIFTY COUNT-UP
+===================================================== */
+document.addEventListener('DOMContentLoaded', function () {
+
+    const fiftySection = document.querySelector('.fifty-section');
+    const counter = fiftySection && fiftySection.querySelector('.fifty-count');
+
+    if (!fiftySection || !counter) return;
+
+    let animated = false;
+
+    function runCount() {
+        const target = parseInt(counter.dataset.target, 10) || 50;
+        const duration = 2200;
+        const startTime = performance.now();
+
+        function tick(now) {
+            const elapsed  = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased    = 1 - Math.pow(1 - progress, 3);
+            counter.textContent = Math.floor(eased * target);
+            if (progress < 1) requestAnimationFrame(tick);
+            else counter.textContent = target;
+        }
+
+        requestAnimationFrame(tick);
+    }
+
+    const obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting && !animated) {
+                animated = true;
+                runCount();
+                obs.unobserve(fiftySection);
+            }
+        });
+    }, { threshold: 0.3 });
+
+    obs.observe(fiftySection);
+
+});
+
+
+/* =====================================================
    TIMELINE
 ===================================================== */
 document.addEventListener('DOMContentLoaded', function () {
@@ -114,12 +158,10 @@ document.addEventListener('DOMContentLoaded', function () {
             n.setAttribute('aria-pressed', i === index ? 'true' : 'false');
         });
 
-        // move the red dot
         dot.style.left = ((index / (TIMELINE.length - 1)) * 100) + '%';
 
-        // update detail with fade animation
         detail.classList.remove('tl-animate');
-        void detail.offsetWidth; // force reflow
+        void detail.offsetWidth;
         detail.classList.add('tl-animate');
 
         big.textContent  = TIMELINE[index].year;
@@ -139,127 +181,66 @@ document.addEventListener('DOMContentLoaded', function () {
 ===================================================== */
 document.addEventListener('DOMContentLoaded', function () {
 
-    const slides = document.querySelectorAll('.hero-slide');
-    const nextButton = document.querySelector('.next-slide');
-    const prevButton = document.querySelector('.prev-slide');
-
-    const currentNumber =
-        document.querySelector('.current-slide');
-
-    const progressActive =
-        document.querySelector('.progress-active');
-
-    const progressDot =
-        document.querySelector('.progress-dot');
+    const slides      = document.querySelectorAll('.hero-slide');
+    const nextButton  = document.querySelector('.next-slide');
+    const prevButton  = document.querySelector('.prev-slide');
+    const currentNumber  = document.querySelector('.current-slide');
+    const progressActive = document.querySelector('.progress-active');
+    const progressDot    = document.querySelector('.progress-dot');
 
     let current = 0;
     let autoplay;
-
     const total = slides.length;
 
-
     function updateSlide(index) {
-
-        slides.forEach((slide, i) => {
-            slide.classList.toggle('active', i === index);
-        });
-
-        currentNumber.textContent =
-            String(index + 1).padStart(2, '0');
-
-        const percentage =
-            ((index + 1) / total) * 100;
-
-        progressActive.style.width =
-            percentage + '%';
-
-        progressDot.style.left =
-            `calc(${percentage}% - 5px)`;
+        slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
+        currentNumber.textContent = String(index + 1).padStart(2, '0');
+        const pct = ((index + 1) / total) * 100;
+        progressActive.style.width = pct + '%';
+        progressDot.style.left = `calc(${pct}% - 5px)`;
     }
-
 
     function nextSlide() {
-
-        current++;
-
-        if (current >= total) {
-            current = 0;
-        }
-
+        current = (current + 1) % total;
         updateSlide(current);
         restartAutoplay();
     }
-
 
     function previousSlide() {
-
-        current--;
-
-        if (current < 0) {
-            current = total - 1;
-        }
-
+        current = (current - 1 + total) % total;
         updateSlide(current);
         restartAutoplay();
     }
 
-
     function startAutoplay() {
-
         autoplay = setInterval(() => {
-
-            current++;
-
-            if (current >= total) {
-                current = 0;
-            }
-
+            current = (current + 1) % total;
             updateSlide(current);
-
         }, 6000);
     }
 
-
     function restartAutoplay() {
-
         clearInterval(autoplay);
         startAutoplay();
-
     }
-
 
     nextButton.addEventListener('click', nextSlide);
     prevButton.addEventListener('click', previousSlide);
 
-
-    /* Keyboard navigation */
-
-    document.addEventListener('keydown', function (event) {
-
-        if (event.key === 'ArrowRight') {
-            nextSlide();
-        }
-
-        if (event.key === 'ArrowLeft') {
-            previousSlide();
-        }
-
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') nextSlide();
+        if (e.key === 'ArrowLeft')  previousSlide();
     });
-
-
-    /* Initial state */
 
     updateSlide(0);
     startAutoplay();
 
-
-
-
-
-    
-
 });
 
+
+/* =====================================================
+   PORTFOLIO SLIDER
+===================================================== */
 document.addEventListener('DOMContentLoaded', () => {
 
     const section =
@@ -275,428 +256,172 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.portfolio-card');
 
     const progressBar =
-        document.querySelector(
-            '.portfolio-progress-active'
-        );
+        document.querySelector('.portfolio-progress-active');
 
     const progressDot =
-        document.querySelector(
-            '.portfolio-progress-dot'
-        );
+        document.querySelector('.portfolio-progress-dot');
 
     const currentNumber =
-        document.querySelector(
-            '.portfolio-current'
-        );
+        document.querySelector('.portfolio-current');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Safety check
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-        !section ||
-        !container ||
-        !track ||
-        !cards.length ||
-        !progressBar ||
-        !progressDot
-    ) {
+    if (!section || !container || !track || !cards.length || !progressBar || !progressDot) {
         return;
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Get the actual horizontal travel distance
-    |--------------------------------------------------------------------------
-    */
-
     function getHorizontalDistance() {
-
-        const trackWidth =
-            track.scrollWidth;
-
-        const viewportWidth =
-            container.clientWidth;
-
-        return Math.max(
-            0,
-            trackWidth - viewportWidth
-        );
-
+        return Math.max(0, track.scrollWidth - container.clientWidth);
     }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Get vertical scroll progress through section
-    |--------------------------------------------------------------------------
-    */
 
     function getScrollProgress() {
-
-        const sectionTop =
-            section.offsetTop;
-
-        const sectionHeight =
-            section.offsetHeight;
-
-        const viewportHeight =
-            window.innerHeight;
-
-
-        const scrollTop =
-            window.pageYOffset ||
-            document.documentElement.scrollTop;
-
-
-        /*
-        Where are we inside the section?
-        */
-
-        const distanceFromStart =
-            scrollTop - sectionTop;
-
-
-        /*
-        The sticky viewport stays for this
-        entire distance.
-        */
-
-        const scrollDistance =
-            sectionHeight -
-            viewportHeight;
-
-
-        let progress =
-            distanceFromStart /
-            scrollDistance;
-
-
-        /*
-        Keep between 0 and 1.
-        */
-
-        progress =
-            Math.max(
-                0,
-                Math.min(
-                    1,
-                    progress
-                )
-            );
-
-
-        return progress;
-
+        const sectionTop    = section.offsetTop;
+        const sectionHeight = section.offsetHeight;
+        const viewportHeight = window.innerHeight;
+        const scrollTop     = window.pageYOffset || document.documentElement.scrollTop;
+        const distanceFromStart = scrollTop - sectionTop;
+        const scrollDistance    = sectionHeight - viewportHeight;
+        return Math.max(0, Math.min(1, distanceFromStart / scrollDistance));
     }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Update slider
-    |--------------------------------------------------------------------------
-    */
 
     function updatePortfolio() {
+        const progress           = getScrollProgress();
+        const horizontalDistance = getHorizontalDistance();
+        const x                  = horizontalDistance * progress;
 
-        const progress =
-            getScrollProgress();
+        track.style.transform = `translate3d(-${x}px, 0, 0)`;
 
+        const percentage = progress * 100;
+        progressBar.style.width = percentage + '%';
+        progressDot.style.left  = `calc(${percentage}% - 5px)`;
 
-        const horizontalDistance =
-            getHorizontalDistance();
-
-
-        /*
-        Calculate horizontal position.
-        */
-
-        const x =
-            horizontalDistance *
-            progress;
-
-
-        /*
-        MOVE CARDS LEFT
-        */
-
-        track.style.transform =
-            `translate3d(
-                -${x}px,
-                0,
-                0
-            )`;
-
-
-        /*
-        RED PROGRESS LINE
-        */
-
-        const percentage =
-            progress * 100;
-
-
-        progressBar.style.width =
-            percentage + '%';
-
-
-        /*
-        RED DOT
-        */
-
-        progressDot.style.left =
-            `calc(
-                ${percentage}% - 5px
-            )`;
-
-
-        /*
-        CURRENT CARD
-        */
-
-        const cardWidth =
-            cards[0].offsetWidth;
-
-
-        const gap =
-            parseFloat(
-                window.getComputedStyle(track).gap
-            ) || 25;
-
-
-        const cardStep =
-            cardWidth + gap;
-
-
-        let currentIndex =
-            Math.round(
-                x / cardStep
-            );
-
-
-        currentIndex =
-            Math.max(
-                0,
-                Math.min(
-                    cards.length - 1,
-                    currentIndex
-                )
-            );
-
-
-        currentNumber.textContent =
-            String(currentIndex + 1)
-                .padStart(2, '0');
-
+        const cardWidth  = cards[0].offsetWidth;
+        const gap        = parseFloat(window.getComputedStyle(track).gap) || 25;
+        const cardStep   = cardWidth + gap;
+        let currentIndex = Math.round(x / cardStep);
+        currentIndex     = Math.max(0, Math.min(cards.length - 1, currentIndex));
+        currentNumber.textContent = String(currentIndex + 1).padStart(2, '0');
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Scroll listener
-    |--------------------------------------------------------------------------
-    */
-
     let ticking = false;
-
-
-    window.addEventListener(
-        'scroll',
-        () => {
-
-            if (!ticking) {
-
-                window.requestAnimationFrame(
-                    () => {
-
-                        updatePortfolio();
-
-                        ticking = false;
-
-                    }
-                );
-
-                ticking = true;
-
-            }
-
-        },
-        {
-            passive: true
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => { updatePortfolio(); ticking = false; });
+            ticking = true;
         }
-    );
+    }, { passive: true });
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Resize
-    |--------------------------------------------------------------------------
-    */
-
-    window.addEventListener(
-        'resize',
-        () => {
-
-            updatePortfolio();
-
-        }
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Initial update
-    |--------------------------------------------------------------------------
-    */
+    window.addEventListener('resize', () => { updatePortfolio(); });
 
     updatePortfolio();
 
 });
 
+
+/* =====================================================
+   EXECUTIVE TEAM — SCROLL REVEAL
+===================================================== */
 document.addEventListener("DOMContentLoaded", function () {
 
-    const section =
-        document.querySelector("#executive-team");
-
-    if (!section) {
-        return;
-    }
-
-
-    /* =====================================================
-       SCROLL REVEAL
-    ===================================================== */
+    const section = document.querySelector("#executive-team");
+    if (!section) return;
 
     if ("IntersectionObserver" in window) {
 
-        const observer =
-            new IntersectionObserver(
-                function (entries, observer) {
-
-                    entries.forEach(function (entry) {
-
-                        if (!entry.isIntersecting) {
-                            return;
-                        }
-
-                        section.classList.add("is-visible");
-
-                        observer.unobserve(
-                            entry.target
-                        );
-
-                    });
-
-                },
-                {
-                    threshold: 0.12,
-                    rootMargin: "0px 0px -70px 0px"
-                }
-            );
+        const observer = new IntersectionObserver(
+            function (entries, observer) {
+                entries.forEach(function (entry) {
+                    if (!entry.isIntersecting) return;
+                    section.classList.add("is-visible");
+                    observer.unobserve(entry.target);
+                });
+            },
+            { threshold: 0.12, rootMargin: "0px 0px -70px 0px" }
+        );
 
         observer.observe(section);
 
     } else {
-
         section.classList.add("is-visible");
-
     }
 
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-    const section = document.querySelector("#sustainability");
-    const counters = section.querySelectorAll(".counter");
 
+/* =====================================================
+   SUSTAINABILITY COUNTERS
+===================================================== */
+document.addEventListener("DOMContentLoaded", function () {
+
+    const section  = document.querySelector("#sustainability");
+    const counters = section.querySelectorAll(".counter");
     let hasAnimated = false;
 
     function animateCounter(counter) {
-      const target = Number(counter.dataset.target);
-      const duration = target > 1000 ? 1800 : 1200;
-      const startTime = performance.now();
+        const target    = Number(counter.dataset.target);
+        const duration  = target > 1000 ? 1800 : 1200;
+        const startTime = performance.now();
 
-      function update(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        // Smooth ease-out animation
-        const easedProgress = 1 - Math.pow(1 - progress, 3);
-        const currentValue = Math.floor(easedProgress * target);
-
-        counter.textContent = currentValue.toLocaleString();
-
-        if (progress < 1) {
-          requestAnimationFrame(update);
-        } else {
-          counter.textContent = target.toLocaleString();
+        function update(currentTime) {
+            const elapsed      = currentTime - startTime;
+            const progress     = Math.min(elapsed / duration, 1);
+            const easedProgress = 1 - Math.pow(1 - progress, 3);
+            counter.textContent = Math.floor(easedProgress * target).toLocaleString();
+            if (progress < 1) requestAnimationFrame(update);
+            else counter.textContent = target.toLocaleString();
         }
-      }
 
-      requestAnimationFrame(update);
+        requestAnimationFrame(update);
     }
 
     const observer = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting && !hasAnimated) {
-            hasAnimated = true;
-
-            counters.forEach(function (counter, index) {
-              setTimeout(function () {
-                animateCounter(counter);
-              }, index * 100);
+        function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting && !hasAnimated) {
+                    hasAnimated = true;
+                    counters.forEach(function (counter, i) {
+                        setTimeout(function () { animateCounter(counter); }, i * 100);
+                    });
+                    observer.unobserve(section);
+                }
             });
-
-            observer.unobserve(section);
-          }
-        });
-      },
-      {
-        threshold: 0.25
-      }
+        },
+        { threshold: 0.25 }
     );
 
     observer.observe(section);
-  });
 
-  document.addEventListener("DOMContentLoaded", function () {
+});
 
-    const accordionItems =
-      document.querySelectorAll(".sustainability-accordion .accordion-item");
+
+/* =====================================================
+   SUSTAINABILITY ACCORDION
+===================================================== */
+document.addEventListener("DOMContentLoaded", function () {
+
+    const accordionItems = document.querySelectorAll(".sustainability-accordion .accordion-item");
 
     accordionItems.forEach(function (item) {
 
-      const trigger = item.querySelector(".accordion-trigger");
+        const trigger = item.querySelector(".accordion-trigger");
 
-      trigger.addEventListener("click", function () {
+        trigger.addEventListener("click", function () {
 
-        const isActive = item.classList.contains("active");
+            const isActive = item.classList.contains("active");
 
-        // Close all items
-        accordionItems.forEach(function (otherItem) {
-          otherItem.classList.remove("active");
+            accordionItems.forEach(function (other) {
+                other.classList.remove("active");
+                other.querySelector(".accordion-trigger").setAttribute("aria-expanded", "false");
+            });
 
-          const otherTrigger =
-            otherItem.querySelector(".accordion-trigger");
+            if (!isActive) {
+                item.classList.add("active");
+                trigger.setAttribute("aria-expanded", "true");
+            }
 
-          otherTrigger.setAttribute("aria-expanded", "false");
         });
-
-        // Open clicked item if it wasn't already open
-        if (!isActive) {
-          item.classList.add("active");
-          trigger.setAttribute("aria-expanded", "true");
-        }
-
-      });
 
     });
 
-  });
+});
 </script>
 
 </body>

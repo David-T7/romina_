@@ -1,4 +1,4 @@
-/* =====================================================
+﻿/* =====================================================
    GLOBAL
 ===================================================== */
 
@@ -663,7 +663,7 @@ button {
 
 
 .about-section {
-    padding: clamp(20px, 3vw, 40px) 0 clamp(80px, 10vw, 120px);
+    padding: clamp(20px, 3vw, 40px) 0 clamp(40px, 5vw, 64px);
     background: var(--white);
 }
 
@@ -1699,6 +1699,8 @@ button {
 
     height: 100vh;
 
+    padding-top: 100px;
+
     display: flex;
 
     flex-direction: column;
@@ -1714,35 +1716,25 @@ button {
 ===================================================== */
 
 .portfolio-header {
-    display: grid;
+    display: flex;
 
-    grid-template-columns: 1.1fr .9fr;
-
-    align-items: end;
-
-    gap: 80px;
+    flex-direction: column;
 
     margin-bottom: 45px;
 
     flex-shrink: 0;
 }
 
-
-.portfolio-label {
-    display: block;
-
-    margin-bottom: 18px;
-
-    color: var(--red);
-
-    font-size: 11px;
-
-    font-weight: 700;
-
-    letter-spacing: 3px;
-
-    text-transform: uppercase;
+.portfolio-header .mark {
+    margin-bottom: 14px;
 }
+
+.portfolio-header .t-h2 {
+    margin-top: 40px;
+}
+
+
+/* .portfolio-label replaced by .mark.tone-white */
 
 
 .portfolio-header h2 {
@@ -2278,1146 +2270,150 @@ button {
 }
 
 /* =========================================================
-   WHO WE ARE
+   FIFTY SECTION
 ========================================================= */
 
-.who-we-are {
+.fifty-section {
 
-    position: relative;
-
-    width: 100%;
-
-    padding:
-        100px 0 0 0;
-
-    background:
-        #ffffff;
-
-    color:
-        var(--deep-blue);
-
-    overflow: hidden;
+    padding: clamp(20px, 3vw, 40px) 0 clamp(80px, 10vw, 120px);
+    background: var(--white);
 
 }
 
 
-/* =========================================================
-   CONTAINER
-========================================================= */
-
-.who-container {
-
-    width:
-        min(
-            1380px,
-            calc(100% - 80px)
-        );
-
-    margin: 0 auto;
-
-}
-
-
-/* =========================================================
-   TOP BAR
-========================================================= */
-
-.who-top {
+.fifty-grid {
 
     display: grid;
-
-    grid-template-columns:
-        auto
-        1fr
-        auto;
-
+    grid-template-columns: auto 1fr;
+    gap: clamp(32px, 6vw, 96px);
     align-items: center;
 
-    gap: 25px;
-
-    margin-bottom: 85px;
-
 }
 
 
-.who-eyebrow {
+/* --- big number --- */
 
-    color:
-        var(--red);
-
-    font-size: 11px;
-
-    font-weight: 700;
-
-    letter-spacing: 3px;
-
-}
-
-
-.who-top-line {
-
-    width: 100%;
-
-    height: 1px;
-
-    background:
-        rgba(
-            7,
-            27,
-            58,
-            .15
-        );
-
-}
-
-
-.who-location {
-
-    color:
-        rgba(
-            7,
-            27,
-            58,
-            .45
-        );
-
-    font-size: 10px;
-
-    font-weight: 600;
-
-    letter-spacing: 2px;
-
-}
-
-
-/* =========================================================
-   INTRO
-========================================================= */
-
-.who-intro {
-
-    display: grid;
-
-    grid-template-columns:
-        250px
-        1fr;
-
-    gap: 90px;
-
-    align-items: end;
-
-    margin-bottom: 100px;
-
-}
-
-
-/* =========================================================
-   50+ STAT
-========================================================= */
-
-.who-intro-number {
+.fifty-num {
 
     display: flex;
-
-    flex-wrap: wrap;
-
     align-items: flex-start;
 
-    color:
-        var(--deep-blue);
+    font-weight: 900;
+    font-size: clamp(150px, 25vw, 380px);
+    line-height: .8;
+    letter-spacing: -.06em;
+
+    color: var(--deep-blue);
 
 }
 
 
-.who-intro-number > span {
+.fifty-plus {
 
-    font-size:
-        clamp(
-            100px,
-            12vw,
-            170px
-        );
-
-    font-weight: 500;
-
-    line-height: .72;
-
-    letter-spacing: -10px;
+    color: var(--red);
+    font-size: .42em;
+    line-height: 1;
+    margin-left: .04em;
+    margin-top: .02em;
 
 }
 
 
-.who-intro-number > small {
+/* --- copy --- */
 
-    margin-top: 3px;
-
-    color:
-        var(--red);
-
-    font-size: 35px;
-
-    font-weight: 500;
-
-}
-
-
-.who-intro-number > div {
-
-    width: 100%;
-
-    margin-top: 15px;
-
-    color:
-        rgba(
-            7,
-            27,
-            58,
-            .42
-        );
-
-    font-size: 9px;
-
-    font-weight: 700;
-
-    line-height: 1.5;
-
-    letter-spacing: 2px;
-
-}
-
-
-/* =========================================================
-   MAIN TITLE
-========================================================= */
-
-.who-intro-content h2 {
-
-    max-width: 950px;
-
-    margin: 0;
-
-    color:
-        var(--deep-blue);
-
-    font-size:
-        clamp(
-            48px,
-            6vw,
-            88px
-        );
-
-    font-weight: 500;
-
-    line-height: .98;
-
-    letter-spacing: -4px;
-
-}
-
-
-.who-intro-content h2 span {
-
-    color:
-        #8091a9;
-
-}
-
-
-/* =========================================================
-   STORY
-========================================================= */
-
-.who-story {
-
-    display: grid;
-
-    grid-template-columns:
-        1fr
-        1fr;
-
-    min-height: 590px;
-
-    background:
-        #f2f4f7;
-
-}
-
-
-/* =========================================================
-   STORY IMAGE
-========================================================= */
-
-.who-story-image {
-
-    position: relative;
-
-    min-height: 590px;
-
-    overflow: hidden;
-
-    background:
-        #dce2e8;
-
-}
-
-
-.who-story-image img {
-
-    width: 100%;
-
-    height: 100%;
-
-    display: block;
-
-    object-fit: cover;
-
-}
-
-
-.who-image-overlay {
-
-    position: absolute;
-
-    inset: 0;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(
-                7,
-                27,
-                58,
-                .12
-            ),
-            transparent 60%
-        );
-
-}
-
-
-.who-image-caption {
-
-    position: absolute;
-
-    left: 35px;
-
-    bottom: 30px;
-
-    padding:
-        9px 13px;
-
-    border:
-        1px solid
-        rgba(
-            255,
-            255,
-            255,
-            .4
-        );
-
-    color: #ffffff;
-
-    font-size: 10px;
-
-    font-weight: 700;
-
-    letter-spacing: 2px;
-
-}
-
-
-/* =========================================================
-   STORY CONTENT
-========================================================= */
-
-.who-story-content {
+.fifty-copy {
 
     display: flex;
-
     flex-direction: column;
-
-    justify-content: center;
-
-    padding:
-        70px 75px;
+    gap: 14px;
 
 }
 
 
-.who-story-index {
+.fifty-heading {
 
-    margin-bottom: 35px;
-
-    color:
-        var(--red);
-
-    font-size: 10px;
-
-    font-weight: 700;
-
-    letter-spacing: 2.5px;
+    font-weight: 300;
+    font-size: clamp(34px, 4.6vw, 66px);
+    line-height: 1.04;
+    letter-spacing: -.022em;
+    color: var(--deep-blue);
+    max-width: 18ch;
 
 }
 
 
-.who-story-content p {
-
-    max-width: 530px;
-
-    margin:
-        0 0 25px;
-
-    color:
-        rgba(
-            7,
-            27,
-            58,
-            .6
-        );
-
-    font-size: 14px;
-
-    line-height: 1.85;
-
-}
-
-
-.who-story-content .who-lead {
-
-    color:
-        var(--deep-blue);
-
-    font-size: 20px;
-
-    line-height: 1.55;
-
-}
-
-
-.who-story-content .who-lead strong {
-
-    font-weight: 600;
-
-    color:
-        var(--deep-blue);
-
-}
-
-
-/* =========================================================
-   DIVIDER
-========================================================= */
-
-.who-divider {
-
-    width: 100%;
-
-    height: 1px;
-
-    margin:
-        20px 0
-        28px;
-
-    background:
-        rgba(
-            7,
-            27,
-            58,
-            .12
-        );
-
-}
-
-
-/* =========================================================
-   SIGNATURE
-========================================================= */
-
-.who-signature {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 15px;
-
-}
-
-
-.who-signature-line {
-
-    width: 35px;
-
-    height: 1px;
-
-    background:
-        var(--red);
-
-}
-
-
-.who-signature strong {
-
-    display: block;
-
-    color:
-        var(--deep-blue);
-
-    font-family:
-        Georgia,
-        serif;
-
-    font-size: 16px;
-
-    font-weight: 400;
-
-    font-style: italic;
-
-}
-
-
-.who-signature small {
-
-    display: block;
-
-    margin-top: 3px;
-
-    color:
-        rgba(
-            7,
-            27,
-            58,
-            .4
-        );
-
-    font-size: 9px;
-
-    letter-spacing: 1px;
-
-}
-
-
-/* =========================================================
-   SECTORS
-========================================================= */
-
-.who-sectors {
-
-    margin-top: 120px;
-
-}
-
-
-.who-sectors-heading {
-
-    display: grid;
-
-    grid-template-columns:
-        1fr
-        1fr;
-
-    gap: 80px;
-
-    margin-bottom: 45px;
-
-}
-
-
-.who-sectors-heading > span {
-
-    color:
-        var(--red);
-
-    font-size: 10px;
-
-    font-weight: 700;
-
-    letter-spacing: 2.5px;
-
-}
-
-
-.who-sectors-heading p {
-
-    max-width: 500px;
-
-    margin: 0;
-
-    color:
-        rgba(
-            7,
-            27,
-            58,
-            .55
-        );
-
-    font-size: 14px;
-
-    line-height: 1.75;
-
-}
-
-
-/* =========================================================
-   SECTOR GRID
-========================================================= */
-
-.who-sector-grid {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            2,
-            1fr
-        );
-
-    border-top:
-        1px solid
-        rgba(
-            7,
-            27,
-            58,
-            .14
-        );
-
-}
-
-
-/* =========================================================
-   SECTOR
-========================================================= */
-
-.who-sector {
-
-    position: relative;
-
-    min-height: 240px;
-
-    display: grid;
-
-    grid-template-columns:
-        55px
-        1fr
-        35px;
-
-    gap: 15px;
-
-    padding:
-        38px 25px 38px 0;
-
-    border-bottom:
-        1px solid
-        rgba(
-            7,
-            27,
-            58,
-            .14
-        );
-
-    transition:
-        background .3s ease,
-        padding .3s ease;
-
-}
-
-
-.who-sector:nth-child(
-    odd
-) {
-
-    border-right:
-        1px solid
-        rgba(
-            7,
-            27,
-            58,
-            .14
-        );
-
-    padding-right: 50px;
-
-}
-
-
-.who-sector:nth-child(
-    even
-) {
-
-    padding-left: 50px;
-
-}
-
-
-.who-sector:hover {
-
-    background:
-        #f5f7f9;
-
-}
-
-
-/* =========================================================
-   SECTOR NUMBER
-========================================================= */
-
-.who-sector-number {
-
-    color:
-        var(--red);
-
-    font-size: 10px;
-
-    font-weight: 700;
-
-    letter-spacing: 1px;
-
-}
-
-
-/* =========================================================
-   SECTOR CONTENT
-========================================================= */
-
-.who-sector-content h3 {
-
-    max-width: 400px;
-
-    margin: 0;
-
-    color:
-        var(--deep-blue);
-
-    font-size: 25px;
-
-    font-weight: 500;
-
-    line-height: 1.15;
-
-    letter-spacing: -.5px;
-
-}
-
-
-.who-sector-content p {
-
-    max-width: 410px;
-
-    margin:
-        17px 0 0;
-
-    color:
-        rgba(
-            7,
-            27,
-            58,
-            .5
-        );
-
-    font-size: 12px;
-
-    line-height: 1.7;
-
-}
-
-
-/* =========================================================
-   ARROW
-========================================================= */
-
-.who-sector-arrow {
-
-    align-self: start;
-
-    color:
-        var(--red);
-
-    font-size: 20px;
-
-    transition:
-        transform .3s ease;
-
-}
-
-
-.who-sector:hover
-.who-sector-arrow {
-
-    transform:
-        translate(
-            4px,
-            -4px
-        );
-
-}
-
-
-/* =========================================================
-   BOTTOM STATEMENT
-========================================================= */
-
-.who-bottom {
-
-    display: grid;
-
-    grid-template-columns:
-        1fr
-        2fr
-        auto;
-
-    align-items: center;
-
-    gap: 50px;
-
-    margin-top: 100px;
-
-}
-
-
-.who-bottom-line {
-
-    height: 1px;
-
-    background:
-        rgba(
-            7,
-            27,
-            58,
-            .14
-        );
-
-}
-
-
-.who-bottom p {
-
-    max-width: 700px;
-
-    margin: 0;
-
-    color:
-        var(--deep-blue);
+.fifty-since {
 
     font-size: 18px;
-
-    font-weight: 400;
-
-    line-height: 1.55;
+    font-weight: 700;
+    color: var(--red);
 
 }
 
 
-.who-bottom-mark {
+.fifty-body {
+
+    font-size: 16px;
+    line-height: 1.72;
+    color: var(--gray);
+    max-width: 60ch;
+
+}
+
+
+/* --- brand divider (long bar · red dot · short bar) --- */
+
+.divider {
 
     display: flex;
-
     align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 340px;
 
-    justify-content: center;
+}
 
-    width: 55px;
+.divider b {
 
-    height: 55px;
+    height: 4px;
+    background: var(--deep-blue);
+    flex: 1;
 
-    border:
-        1px solid
-        rgba(
-            7,
-            27,
-            58,
-            .2
-        );
+}
 
-    color:
-        var(--deep-blue);
+.divider b:last-child {
 
-    font-size: 12px;
+    flex: 0 0 22%;
 
-    font-weight: 700;
+}
 
-    letter-spacing: 1px;
+.divider i {
+
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--red);
+    flex: none;
+
+}
+
+.fifty-div {
+
+    margin-top: 18px;
 
 }
 
 
-/* =========================================================
-   TABLET
-========================================================= */
+/* --- responsive --- */
 
-@media (max-width: 1000px) {
+@media (max-width: 900px) {
 
-    .who-we-are {
-
-        padding:
-            110px 0;
-
-    }
-
-
-    .who-container {
-
-        width:
-            calc(100% - 50px);
-
-    }
-
-
-    .who-intro {
-
-        grid-template-columns:
-            170px
-            1fr;
-
-        gap: 45px;
-
-    }
-
-
-    .who-intro-content h2 {
-
-        font-size: 52px;
-
-    }
-
-
-    .who-story-content {
-
-        padding:
-            45px;
-
-    }
-
-
-    .who-sector:nth-child(
-        odd
-    ) {
-
-        padding-right: 25px;
-
-    }
-
-
-    .who-sector:nth-child(
-        even
-    ) {
-
-        padding-left: 25px;
-
+    .fifty-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
     }
 
 }
-
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media (max-width: 700px) {
-
-    .who-we-are {
-
-        padding:
-            90px 0
-            100px;
-
-    }
-
-
-    .who-container {
-
-        width:
-            calc(100% - 30px);
-
-    }
-
-
-    .who-top {
-
-        grid-template-columns:
-            auto
-            1fr;
-
-        gap: 15px;
-
-        margin-bottom: 55px;
-
-    }
-
-
-    .who-location {
-
-        display: none;
-
-    }
-
-
-    .who-intro {
-
-        display: block;
-
-        margin-bottom: 60px;
-
-    }
-
-
-    .who-intro-number {
-
-        margin-bottom: 55px;
-
-    }
-
-
-    .who-intro-number > span {
-
-        font-size: 115px;
-
-    }
-
-
-    .who-intro-content h2 {
-
-        font-size: 45px;
-
-        letter-spacing: -2px;
-
-    }
-
-
-    .who-story {
-
-        display: block;
-
-    }
-
-
-    .who-story-image {
-
-        min-height: 330px;
-
-        height: 330px;
-
-    }
-
-
-    .who-story-content {
-
-        padding:
-            40px 25px 45px;
-
-    }
-
-
-    .who-story-content .who-lead {
-
-        font-size: 17px;
-
-    }
-
-
-    .who-story-content p {
-
-        font-size: 12px;
-
-    }
-
-
-    .who-sectors {
-
-        margin-top: 80px;
-
-    }
-
-
-    .who-sectors-heading {
-
-        display: block;
-
-        margin-bottom: 30px;
-
-    }
-
-
-    .who-sectors-heading p {
-
-        margin-top: 20px;
-
-        font-size: 12px;
-
-    }
-
-
-    .who-sector-grid {
-
-        display: block;
-
-    }
-
-
-    .who-sector,
-    .who-sector:nth-child(
-        odd
-    ),
-    .who-sector:nth-child(
-        even
-    ) {
-
-        grid-template-columns:
-            40px
-            1fr
-            25px;
-
-        min-height: 190px;
-
-        padding:
-            28px 0;
-
-        border-right: 0;
-
-    }
-
-
-    .who-sector-content h3 {
-
-        font-size: 21px;
-
-    }
-
-
-    .who-sector-content p {
-
-        font-size: 11px;
-
-    }
-
-
-    .who-bottom {
-
-        display: block;
-
-        margin-top: 65px;
-
-    }
-
-
-    .who-bottom-line {
-
-        margin-bottom: 30px;
-
-    }
-
-
-    .who-bottom p {
-
-        font-size: 17px;
-
-    }
-
-
-    .who-bottom-mark {
-
-        margin-top: 35px;
-
-    }
 
 }
 
@@ -6604,3 +5600,356 @@ button {
       transition: none;
     }
   }
+}
+
+
+/* =========================================================
+   BUSINESS PORTFOLIO (PORT) — React exact port
+========================================================= */
+
+/* ---- layout shell ---- */
+
+.port {
+    position: relative;
+    background: #0E2240;
+    color: #fff;
+}
+
+.port-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(24px, 4vh, 44px);
+    padding-top: 92px;
+}
+
+.port-wrap {
+    width: 100%;
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 4.4vw, 64px);
+}
+
+.port-head {
+    display: flex;
+    flex-direction: column;
+}
+
+.port-head .mark {
+    margin-bottom: 14px;
+}
+
+/* ---- track ---- */
+
+.port-track {
+    display: flex;
+    gap: 28px;
+    padding-left: max(clamp(20px, 4.4vw, 64px), calc((100vw - 1360px) / 2 + 64px));
+    will-change: transform;
+}
+
+.port-end {
+    flex: 0 0 clamp(20px, 4.4vw, 64px);
+}
+
+/* ---- panels ---- */
+
+.panel {
+    flex: 0 0 min(1060px, 76vw);
+    height: min(58vh, 560px);
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    background: #091A33;
+    overflow: hidden;
+}
+
+.panel-media {
+    position: relative;
+    overflow: hidden;
+}
+
+.panel-body {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(28px, 3vw, 48px);
+    gap: 16px;
+}
+
+.panel-body h3 {
+    font-size: clamp(26px, 2.5vw, 38px);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -.015em;
+    transition: transform .6s cubic-bezier(.16, 1, .3, 1);
+    color: #fff;
+    max-width: 18ch;
+    margin: 0;
+}
+
+.panel-body > p {
+    color: rgba(255, 255, 255, .72);
+    max-width: 36ch;
+    transition: transform .6s cubic-bezier(.16, 1, .3, 1);
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.panel-more {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+        opacity .6s cubic-bezier(.16, 1, .3, 1),
+        transform .6s cubic-bezier(.16, 1, .3, 1);
+}
+
+.panel-more ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.panel-more li {
+    font-size: 13px;
+    padding: 6px 12px;
+    border: 1px solid rgba(255, 255, 255, .16);
+    color: rgba(255, 255, 255, .75);
+}
+
+.panel-more .link-cta {
+    align-self: flex-start;
+}
+
+.panel:hover .panel-more,
+.panel:focus-within .panel-more {
+    opacity: 1;
+    transform: none;
+}
+
+.panel:hover h3,
+.panel:focus-within h3,
+.panel:hover .panel-body > p {
+    transform: translateY(-6px);
+}
+
+.panel:hover .ph img {
+    transform: scale(1.06);
+}
+
+/* ---- placeholder ---- */
+
+.ph {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: clamp(18px, 2.4vw, 30px);
+    color: #fff;
+    background: radial-gradient(120% 90% at 18% 8%, #1F3B69 0%, #0E2240 46%, #07111F 100%);
+}
+
+.ph::after {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(255, 255, 255, .13);
+    pointer-events: none;
+}
+
+.ph img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.4s cubic-bezier(.16, 1, .3, 1);
+    z-index: 1;
+}
+
+.ph-tag {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    color: rgba(255, 255, 255, .62);
+    z-index: 2;
+}
+
+.ph-tag i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--red);
+    flex: none;
+}
+
+.ph-shot {
+    position: relative;
+    font-weight: 300;
+    font-size: clamp(15px, 1.3vw, 19px);
+    line-height: 1.35;
+    max-width: 32ch;
+    z-index: 2;
+}
+
+/* ---- progress bar ---- */
+
+.port-prog {
+    position: relative;
+    display: block;
+    height: 2px;
+    background: rgba(255, 255, 255, .16);
+}
+
+.port-prog::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 2px;
+    width: calc(var(--p, 0) * 100%);
+    background: #fff;
+}
+
+.port-prog i {
+    position: absolute;
+    top: -4px;
+    left: calc(var(--p, 0) * (100% - 10px));
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--red);
+}
+
+/* ---- mark component ---- */
+
+.mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: .01em;
+    color: #0E2240;
+    margin-bottom: 28px;
+}
+
+.mark .mark-rule {
+    width: 36px;
+    height: 3px;
+    background: currentColor;
+}
+
+.mark i {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--red);
+    flex: none;
+}
+
+.mark.tone-white {
+    color: #fff;
+}
+
+/* ---- t-h2 ---- */
+
+.t-h2 {
+    font-weight: 300;
+    font-size: clamp(34px, 4.6vw, 66px);
+    line-height: 1.04;
+    letter-spacing: -.022em;
+    color: #0E2240;
+    max-width: 18ch;
+    margin: 0;
+}
+
+.t-h2.light {
+    color: #fff;
+}
+
+/* ---- link-cta ---- */
+
+.link-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    font-size: 15px;
+    color: #0E2240;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 3px;
+    transition: gap .3s cubic-bezier(.16, 1, .3, 1), color .3s;
+    text-decoration: none;
+}
+
+.link-cta:hover {
+    gap: 12px;
+    color: var(--red);
+}
+
+.link-cta.light {
+    color: #fff;
+}
+
+/* ---- responsive ≤ 1024px ---- */
+
+@media (max-width: 1024px) {
+
+    .port-sticky {
+        position: relative;
+        height: auto;
+        padding: clamp(88px, 12vw, 120px) 0 0;
+        overflow: visible;
+    }
+
+    .port-track {
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding-left: clamp(20px, 4.4vw, 64px);
+        padding-bottom: 48px;
+        scrollbar-width: none;
+    }
+
+    .port-track::-webkit-scrollbar {
+        display: none;
+    }
+
+    .panel {
+        flex: 0 0 min(86vw, 560px);
+        height: auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        scroll-snap-align: start;
+    }
+
+    .panel-media {
+        aspect-ratio: 4 / 3;
+    }
+
+    .panel-more {
+        opacity: 1;
+        transform: none;
+    }
+
+    .port-prog {
+        display: none;
+    }
+
+}

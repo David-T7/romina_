@@ -9,24 +9,13 @@
         <!-- Portfolio Header -->
         <div class="portfolio-header">
 
-            <div>
-                <span class="portfolio-label">
-                    BUSINESS PORTFOLIO
-                </span>
+            <p class="mark tone-white">
+                <span class="mark-rule"></span>
+                <i aria-hidden="true"></i>
+                Business portfolio
+            </p>
 
-                <h2>
-                    Four sectors,<br>
-                    <span>built from one restaurant.</span>
-                </h2>
-            </div>
-
-            <div class="portfolio-intro">
-                <p>
-                    From hospitality and coffee to new ventures,
-                    our portfolio brings together businesses built
-                    around quality, people and long-term value.
-                </p>
-            </div>
+            <h2 class="t-h2 light">Four sectors, built from one restaurant.</h2>
 
         </div>
 
