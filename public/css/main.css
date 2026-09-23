@@ -2566,7 +2566,7 @@ button {
     background: #071b3a;
     color: #fff;
     overflow: hidden;
-    margin: clamp(60px, 9vw, 120px) 0;
+    margin-top: clamp(60px, 9vw, 120px);
 }
 
 
@@ -2850,6 +2850,399 @@ button {
         margin-top: 20px;
         padding-top: 18px;
     }
+}
+
+/* =========================================================
+   ROMINA COFFEE
+========================================================= */
+
+.coffee-sec {
+    background: #0E2240;
+    color: #fff;
+    padding-bottom: clamp(88px, 11vw, 150px);
+    --lineL: rgba(255,255,255,.14);
+}
+
+.cof-wrap {
+    width: 100%;
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 4.4vw, 64px);
+}
+
+/* ---- hero: full-bleed beans ---- */
+
+.cof-beans {
+    position: relative;
+    min-height: 92vh;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+}
+
+.cof-beans-img {
+    position: absolute;
+    inset: -12% 0;
+    will-change: transform;
+}
+
+.cof-beans-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 60%;
+    display: block;
+}
+
+.cof-beans-img::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(14,34,64,.35) 0%,
+        rgba(14,34,64,.1) 35%,
+        rgba(14,34,64,.88) 88%,
+        #0E2240 100%
+    );
+}
+
+.cof-beans-copy {
+    position: relative;
+    z-index: 2;
+    padding-bottom: clamp(64px, 9vw, 120px);
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.cof-display {
+    font-weight: 300;
+    font-size: clamp(40px, 5.4vw, 80px);
+    line-height: 1.04;
+    letter-spacing: -.03em;
+    max-width: 17ch;
+    margin: 0;
+    color: #fff;
+}
+
+.cof-lead {
+    font-size: clamp(17px, 1.5vw, 22px);
+    line-height: 1.65;
+    color: rgba(255,255,255,.88);
+    max-width: 52ch;
+    margin: 0;
+    font-weight: 300;
+}
+
+/* ---- grid: sticky photo + stats ---- */
+
+.cof-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: clamp(40px, 7vw, 120px);
+    margin-top: clamp(72px, 9vw, 130px);
+    align-items: start;
+}
+
+.cof-photo {
+    position: sticky;
+    top: 120px;
+}
+
+.cof-photo-in {
+    position: relative;
+    aspect-ratio: 4/5;
+    overflow: hidden;
+    border-radius: 3px;
+}
+
+.cof-photo-in img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 30%;
+    display: block;
+}
+
+.cof-caption {
+    margin-top: 12px;
+    font-size: 12.5px;
+    color: rgba(255,255,255,.55);
+}
+
+/* ---- stats ---- */
+
+.cof-stats {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.cof-stats li {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 30px 0;
+    border-top: 1px solid var(--lineL);
+}
+
+.cof-stats li:last-child {
+    border-bottom: 1px solid var(--lineL);
+}
+
+.cof-stats li > div {
+    display: grid;
+    grid-template-columns: .8fr 1.2fr;
+    gap: 24px;
+    align-items: baseline;
+}
+
+.cof-stat-n {
+    font-weight: 900;
+    font-size: clamp(50px, 5.6vw, 88px);
+    line-height: .88;
+    letter-spacing: -.045em;
+    white-space: nowrap;
+    margin: 0;
+    color: #fff;
+}
+
+.cof-stat-l {
+    font-weight: 700;
+    font-size: 17px;
+    margin: 0;
+    color: #fff;
+}
+
+.cof-stat-t {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: rgba(255,255,255,.66);
+    margin: 0;
+}
+
+/* ---- quote ---- */
+
+.cof-quote {
+    margin-top: clamp(96px, 12vw, 170px);
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+}
+
+.cof-quote-text {
+    font-weight: 300;
+    font-size: clamp(34px, 5.4vw, 80px);
+    line-height: 1.04;
+    letter-spacing: -.03em;
+    max-width: 17ch;
+    margin: 0;
+    color: #fff;
+}
+
+.cof-markets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.cof-markets li {
+    font-size: clamp(18px, 1.8vw, 24px);
+    font-weight: 700;
+    padding-right: 28px;
+    margin-right: 28px;
+    border-right: 1px solid var(--lineL);
+    line-height: 1;
+    color: #fff;
+}
+
+.cof-markets li:last-child {
+    border: 0;
+    padding-right: 0;
+    margin-right: 0;
+}
+
+/* ---- journey ---- */
+
+.cof-journey {
+    margin-top: clamp(96px, 12vw, 160px);
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 40px 60px;
+    align-items: end;
+}
+
+.cof-journey-h3 {
+    grid-column: 1 / -1;
+    font-size: clamp(26px, 2.6vw, 38px);
+    font-weight: 300;
+    letter-spacing: -.02em;
+    color: #fff;
+    margin: 0;
+}
+
+.cof-j-list {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding-top: 8px;
+    padding-left: 0;
+    list-style: none;
+    margin: 0;
+}
+
+.cof-j-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 15px;
+    height: 2px;
+    background: var(--lineL);
+}
+
+.cof-j-line i {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 2.6s cubic-bezier(.16,1,.3,1) .2s;
+    display: block;
+}
+
+.cof-journey.go .cof-j-line i { transform: scaleX(1); }
+
+.cof-j-list li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-right: 12px;
+}
+
+.cof-j-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex: none;
+    background: #0E2240;
+    border: 2px solid rgba(255,255,255,.5);
+    transition: background-color .4s, border-color .4s;
+}
+
+.cof-j-list li:nth-child(2) .cof-j-dot  { transition-delay: .25s; }
+.cof-j-list li:nth-child(3) .cof-j-dot  { transition-delay: .58s; }
+.cof-j-list li:nth-child(4) .cof-j-dot  { transition-delay: .91s; }
+.cof-j-list li:nth-child(5) .cof-j-dot  { transition-delay: 1.24s; }
+.cof-j-list li:nth-child(6) .cof-j-dot  { transition-delay: 1.57s; }
+.cof-j-list li:nth-child(7) .cof-j-dot  { transition-delay: 1.90s; }
+.cof-j-list li:nth-child(8) .cof-j-dot  { transition-delay: 2.23s; }
+
+.cof-journey.go .cof-j-dot { background: #fff; border-color: #fff; }
+.cof-journey.go .cof-j-list li:last-child .cof-j-dot { background: #e3262e; border-color: #e3262e; }
+
+.cof-j-n {
+    font-size: 12px;
+    color: rgba(255,255,255,.5);
+    margin-top: 8px;
+}
+
+.cof-j-name {
+    font-size: clamp(13px, 1.1vw, 16px);
+    font-weight: 500;
+    opacity: .35;
+    transform: translateY(8px);
+    transition: opacity .6s, transform .6s cubic-bezier(.16,1,.3,1);
+}
+
+.cof-j-list li:nth-child(2) .cof-j-name  { transition-delay: .25s; }
+.cof-j-list li:nth-child(3) .cof-j-name  { transition-delay: .58s; }
+.cof-j-list li:nth-child(4) .cof-j-name  { transition-delay: .91s; }
+.cof-j-list li:nth-child(5) .cof-j-name  { transition-delay: 1.24s; }
+.cof-j-list li:nth-child(6) .cof-j-name  { transition-delay: 1.57s; }
+.cof-j-list li:nth-child(7) .cof-j-name  { transition-delay: 1.90s; }
+.cof-j-list li:nth-child(8) .cof-j-name  { transition-delay: 2.23s; }
+
+.cof-journey.go .cof-j-name { opacity: 1; transform: none; }
+
+.cof-j-sort {
+    position: relative;
+    height: 300px;
+    overflow: hidden;
+    border-radius: 3px;
+}
+
+.cof-j-sort img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 40%;
+    display: block;
+}
+
+/* ---- three columns ---- */
+
+.cof-cols {
+    margin-top: clamp(80px, 9vw, 120px);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+}
+
+.cof-cols > div {
+    padding-top: 24px;
+    border-top: 3px solid #fff;
+}
+
+.cof-cols h4 {
+    font-size: 19px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    color: #fff;
+}
+
+.cof-cols p {
+    color: rgba(255,255,255,.7);
+    font-size: 15px;
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* ---- responsive ---- */
+
+@media (max-width: 1023px) {
+    .cof-grid { grid-template-columns: 1fr; }
+    .cof-photo { position: relative; top: 0; }
+    .cof-photo-in { aspect-ratio: 4/3; }
+    .cof-journey { grid-template-columns: 1fr; }
+    .cof-j-sort { height: 220px; }
+}
+
+@media (max-width: 767px) {
+    .cof-stats li > div { grid-template-columns: 1fr; gap: 4px; }
+    .cof-cols { grid-template-columns: 1fr; gap: 28px; }
+    .cof-j-list {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        padding-left: 4px;
+    }
+    .cof-j-line {
+        left: 11px; right: auto;
+        top: 8px; bottom: 8px;
+        width: 2px; height: auto;
+    }
+    .cof-j-line i {
+        transform: scaleY(0);
+        transform-origin: top;
+    }
+    .cof-journey.go .cof-j-line i { transform: scaleY(1); }
+    .cof-j-list li { flex-direction: row; align-items: center; gap: 14px; }
+    .cof-j-n { margin: 0; min-width: 22px; }
+    .cof-markets li { padding-right: 16px; margin-right: 16px; }
 }
 
 /* =========================================================

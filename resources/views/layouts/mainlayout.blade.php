@@ -41,6 +41,8 @@
 
 @include('partials.reviews')
 
+@include('partials.coffee')
+
 @include('partials.executive-team')
 
 @include('partials.businesses')
@@ -359,6 +361,58 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.addEventListener('mouseenter', function () { activate(i); });
         btn.addEventListener('focus',      function () { activate(i); });
     });
+
+});
+
+
+/* =====================================================
+   COFFEE SECTION
+===================================================== */
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* parallax on hero beans image */
+    var beansImg = document.getElementById('cofBeansImg');
+    if (beansImg) {
+        var beansSec = beansImg.closest('.cof-beans');
+        window.addEventListener('scroll', function () {
+            var r = beansSec.getBoundingClientRect();
+            if (r.bottom < 0 || r.top > window.innerHeight) return;
+            var progress = -r.top / window.innerHeight;
+            beansImg.style.transform = 'translate3d(0,' + (progress * 80) + 'px,0)';
+        }, { passive: true });
+    }
+
+    /* journey animate-in */
+    var journey = document.getElementById('cofJourney');
+    if (journey) {
+        new IntersectionObserver(function (entries, obs) {
+            if (entries[0].isIntersecting) {
+                journey.classList.add('go');
+                obs.unobserve(journey);
+            }
+        }, { threshold: 0.25 }).observe(journey);
+    }
+
+    /* stats count-up */
+    var statsEl = document.getElementById('cofStats');
+    if (statsEl) {
+        new IntersectionObserver(function (entries, obs) {
+            if (!entries[0].isIntersecting) return;
+            statsEl.querySelectorAll('.cof-count').forEach(function (el) {
+                var to  = parseInt(el.dataset.to, 10);
+                var dur = to > 1000 ? 2000 : 1200;
+                var t0  = performance.now();
+                (function tick(now) {
+                    var p = Math.min((now - t0) / dur, 1);
+                    var e = 1 - Math.pow(1 - p, 3);
+                    el.textContent = Math.floor(e * to).toLocaleString();
+                    if (p < 1) requestAnimationFrame(tick);
+                    else el.textContent = to.toLocaleString();
+                })(performance.now());
+            });
+            obs.unobserve(statsEl);
+        }, { threshold: 0.15 }).observe(statsEl);
+    }
 
 });
 
