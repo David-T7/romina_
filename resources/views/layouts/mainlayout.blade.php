@@ -49,6 +49,8 @@
 
 @include('partials.sustainability')
 
+@include('partials.contact')
+
 @include('partials.find-us')
 
 @include('partials.footer')
