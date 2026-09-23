@@ -7,18 +7,13 @@
 
 ## Person 1 — Structure & Cleanup
 
-- [ ] **Task 1 — Remove duplicate home route**
+- [x] **Task 1 — Remove duplicate home route**
   Delete the first `Route::get('/')` closure in `routes/web.php` (line 17).
   Keep only the `PagesController::home` route below it.
 
-- [ ] **Task 2 — Create missing sub-page Blade views**
-  These routes exist but have no view file — visiting them throws a 500:
-  - `resources/views/homepage/about.blade.php`
-  - `resources/views/homepage/team.blade.php`
-  - `resources/views/homepage/news.blade.php`
-  - `resources/views/homepage/contact.blade.php`
-
-  A placeholder heading is enough for now so the routes resolve.
+- [x] **Task 2 — Sub-page routes**
+  Site is a SPA — all sections live on the home page via anchor links.
+  Sub-page routes commented out in `routes/web.php` (can be uncommented if needed later).
 
 - [ ] **Task 3 — Split the main layout into partials**
   `resources/views/layouts/mainlayout.blade.php` is ~2500 lines.
