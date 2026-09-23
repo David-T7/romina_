@@ -1680,6 +1680,8 @@ button {
     background: var(--deep-blue);
 
     color: var(--white);
+
+    padding-bottom: clamp(60px, 8vw, 120px);
 }
 
 
@@ -1720,7 +1722,8 @@ button {
 
     flex-direction: column;
 
-    margin-bottom: 45px;
+    margin-top: 60px;
+    margin-bottom: 60px;
 
     flex-shrink: 0;
 }
@@ -1729,29 +1732,7 @@ button {
     margin-bottom: 14px;
 }
 
-.portfolio-header .t-h2 {
-    margin-top: 40px;
-}
-
-
 /* .portfolio-label replaced by .mark.tone-white */
-
-
-.portfolio-header h2 {
-    color: var(--white);
-
-    font-size: clamp(
-        42px,
-        5vw,
-        70px
-    );
-
-    font-weight: 500;
-
-    line-height: .98;
-
-    letter-spacing: -2.5px;
-}
 
 
 .portfolio-header h2 span {
@@ -2187,19 +2168,20 @@ button {
 
     .portfolio-header {
 
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
 
-        gap: 15px;
-
+        margin-top: 40px;
         margin-bottom: 30px;
 
     }
 
+    .portfolio-header .mark {
+        margin-bottom: 10px;
+    }
 
-    .portfolio-header h2 {
-
-        font-size: 42px;
-
+    .portfolio-header .t-h2 {
+        font-size: clamp(28px, 6vw, 42px);
     }
 
 
@@ -5848,20 +5830,29 @@ button {
     letter-spacing: .01em;
     color: #0E2240;
     margin-bottom: 28px;
+    background: none;
+    padding: 0;
+    flex-wrap: nowrap;
 }
 
 .mark .mark-rule {
+    display: block;
+    flex: none;
     width: 36px;
     height: 3px;
     background: currentColor;
+    min-width: 36px;
 }
 
 .mark i {
+    display: block;
+    flex: none;
     width: 9px;
     height: 9px;
+    min-width: 9px;
+    min-height: 9px;
     border-radius: 50%;
     background: var(--red);
-    flex: none;
 }
 
 .mark.tone-white {
