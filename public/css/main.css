@@ -663,54 +663,350 @@ button {
 
 
 .about-section {
+    padding: clamp(80px, 10vw, 140px) 0 clamp(80px, 10vw, 120px);
     background: var(--white);
 }
 
 
-.two-column {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+/* --- two-column intro --- */
 
-    gap: 100px;
+.about-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: clamp(40px, 7vw, 120px);
+    align-items: end;
 }
 
 
-.about-section h2,
-.section-heading h2,
-.sustainability-section h2 {
+.about-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+
+    color: var(--red);
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+}
+
+.about-mark::before {
+    content: "";
+    display: block;
+    width: 28px;
+    height: 2px;
+    background: var(--red);
+}
+
+
+.about-heading {
     margin-top: 20px;
 
     color: var(--deep-blue);
 
-    font-size: clamp(42px, 5vw, 70px);
-
-    line-height: 1;
-
-    letter-spacing: -2px;
+    font-size: clamp(34px, 4vw, 58px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
 }
 
 
-.about-section h2 span,
-.section-heading h2 span,
-.sustainability-section h2 span {
+.about-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 6px;
+}
+
+
+.amh {
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--red);
+    letter-spacing: .5px;
+}
+
+
+.about-sub {
+    font-size: clamp(22px, 2.2vw, 30px);
+    font-weight: 700;
+    color: var(--deep-blue);
+    line-height: 1.2;
+    letter-spacing: -.5px;
+}
+
+
+.about-body {
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--gray);
+    max-width: 48ch;
+}
+
+
+/* --- timeline --- */
+
+.tl {
+    margin-top: clamp(72px, 9vw, 120px);
+}
+
+
+.tl-rail {
+    position: relative;
+    height: 110px;
+    margin: 0 clamp(0px, 2vw, 24px);
+}
+
+
+.tl-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 40px;
+    height: 4px;
+    background: var(--deep-blue);
+}
+
+
+.tl-dot {
+    position: absolute;
+    top: 34px;
+    left: 0%;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    border-radius: 50%;
+    background: var(--red);
+    box-shadow: 0 0 0 6px var(--white);
+    z-index: 2;
+    transition: left .9s cubic-bezier(.77,0,.18,1);
+}
+
+
+.tl-node {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 26px;
+    text-align: center;
+    width: 140px;
+
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+
+    padding: 0;
+}
+
+.tl-node:first-of-type {
+    align-items: flex-start;
+    text-align: left;
+    transform: none;
+}
+
+.tl-node:last-of-type {
+    align-items: flex-end;
+    text-align: right;
+    transform: translateX(-100%);
+}
+
+.tl-node::before {
+    content: "";
+    position: absolute;
+    top: 36px;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    margin-left: -6px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 3px solid var(--deep-blue);
+    transition: border-color .3s, background .3s;
+}
+
+.tl-node:first-of-type::before {
+    left: 0;
+    margin-left: -6px;
+}
+
+.tl-node:last-of-type::before {
+    left: auto;
+    right: 0;
+    margin-right: -6px;
+}
+
+.tl-node.on::before {
+    background: var(--red);
+    border-color: var(--red);
+}
+
+
+.tl-year {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--deep-blue);
+    transition: color .3s;
+}
+
+.tl-title {
+    font-size: 13px;
+    color: var(--gray);
+    transition: color .3s;
+}
+
+.tl-node.on .tl-year {
+    color: var(--red);
+}
+
+.tl-node.on .tl-title {
+    color: var(--dark);
+}
+
+
+/* --- timeline detail --- */
+
+.tl-detail {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: clamp(24px, 5vw, 72px);
+    align-items: center;
+    padding-top: 36px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.tl-detail.tl-animate {
+    animation: tlFadeUp .55s cubic-bezier(.2,.8,.2,1) both;
+}
+
+@keyframes tlFadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+}
+
+
+.tl-big {
+    font-weight: 900;
+    font-size: clamp(64px, 9vw, 136px);
+    line-height: .9;
+    letter-spacing: -.04em;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--deep-blue);
+    user-select: none;
+}
+
+
+.tl-detail p {
+    font-size: clamp(18px, 1.6vw, 23px);
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--dark);
+    max-width: 42ch;
+}
+
+
+/* --- section heading shared --- */
+
+.section-heading h2 {
+    margin-top: 20px;
+    color: var(--deep-blue);
+    font-size: clamp(42px, 5vw, 70px);
+    line-height: 1;
+    letter-spacing: -2px;
+}
+
+.section-heading h2 span {
     color: #8290a5;
 }
 
 
+/* --- legacy helpers kept for other sections --- */
+
+.two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 100px;
+}
+
 .section-description {
     max-width: 600px;
-
     padding-top: 35px;
 }
 
-
 .section-description p {
     margin-bottom: 25px;
-
     color: #667085;
-
     font-size: 18px;
     line-height: 1.8;
+}
+
+
+/* --- responsive --- */
+
+@media (max-width: 900px) {
+
+    .about-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .tl-rail {
+        height: auto;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding-left: 28px;
+    }
+
+    .tl-line {
+        left: 6px;
+        right: auto;
+        top: 6px;
+        bottom: 6px;
+        width: 3px;
+        height: auto;
+    }
+
+    .tl-dot { display: none; }
+
+    .tl-node,
+    .tl-node:first-of-type,
+    .tl-node:last-of-type {
+        position: relative;
+        left: auto !important;
+        transform: none;
+        align-items: flex-start;
+        text-align: left;
+        flex-direction: row;
+        gap: 16px;
+        width: auto;
+        padding: 12px 0;
+    }
+
+    .tl-node::before,
+    .tl-node:first-of-type::before,
+    .tl-node:last-of-type::before {
+        left: -28px;
+        right: auto;
+        top: 17px;
+        margin: 0;
+    }
+
+    .tl-year { min-width: 52px; }
+
+    .tl-detail {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .tl-big { display: none; }
+
 }
 
 

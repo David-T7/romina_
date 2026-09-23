@@ -64,7 +64,7 @@
 
   Replace all `href="#"` with real anchor links once brand panels exist.
 
-- [ ] **Task 7 — Add Company Timeline section**
+- [x] **Task 7 — Add Company Timeline section**
   Add after the *Who We Are* section. 5 milestones:
 
   | Year | Title | Details |

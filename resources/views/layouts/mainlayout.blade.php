@@ -88,6 +88,53 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 /* =====================================================
+   TIMELINE
+===================================================== */
+document.addEventListener('DOMContentLoaded', function () {
+
+    const TIMELINE = [
+        { year: '1973', text: 'Girma Taye opens a small, cherished restaurant in Arat Kilo, in the heart of Addis Ababa.' },
+        { year: '2009', text: 'Romina Coffee launches, taking Ethiopian Arabica to Europe, the USA, Asia and the Middle East.' },
+        { year: '2017', text: 'A partnership between Jaquar Group and Romina Group opens Jaquar World Addis Ababa.' },
+        { year: '2020', text: 'KOBA Patisserie & Bakery is established, built on craftsmanship and artisan baking.' },
+        { year: 'Today', text: 'A diversified Ethiopian group spanning hospitality, coffee export, international trading, importing and distribution.' },
+    ];
+
+    const nodes  = document.querySelectorAll('.tl-node');
+    const dot    = document.getElementById('tlDot');
+    const detail = document.getElementById('tlDetail');
+    const big    = document.getElementById('tlBig');
+    const text   = document.getElementById('tlText');
+
+    if (!nodes.length || !dot || !detail) return;
+
+    function activate(index) {
+        nodes.forEach(function (n, i) {
+            n.classList.toggle('on', i === index);
+            n.setAttribute('aria-pressed', i === index ? 'true' : 'false');
+        });
+
+        // move the red dot
+        dot.style.left = ((index / (TIMELINE.length - 1)) * 100) + '%';
+
+        // update detail with fade animation
+        detail.classList.remove('tl-animate');
+        void detail.offsetWidth; // force reflow
+        detail.classList.add('tl-animate');
+
+        big.textContent  = TIMELINE[index].year;
+        text.textContent = TIMELINE[index].text;
+    }
+
+    nodes.forEach(function (node) {
+        node.addEventListener('click',      function () { activate(+node.dataset.index); });
+        node.addEventListener('mouseenter', function () { activate(+node.dataset.index); });
+    });
+
+});
+
+
+/* =====================================================
    HERO SLIDER
 ===================================================== */
 document.addEventListener('DOMContentLoaded', function () {
