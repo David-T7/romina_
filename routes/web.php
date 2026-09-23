@@ -14,12 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Route::get('/', [PagesController::class, 'home'])->name('home');
-// Route::get('/about', [PagesController::class, 'about'])->name('about');
-// Route::get('/team', [PagesController::class, 'team'])->name('team');
-// Route::get('/news', [PagesController::class, 'news'])->name('news');
-// Route::get('/contact', [PagesController::class, 'contact'])->name('contact');
+Route::get('/about', [PagesController::class, 'about'])->name('about');
+Route::get('/team', [PagesController::class, 'team'])->name('team');
+Route::get('/news', [PagesController::class, 'news'])->name('news');
+Route::get('/contact', [PagesController::class, 'contact'])->name('contact');
