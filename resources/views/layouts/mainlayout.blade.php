@@ -37,6 +37,8 @@
 
 @include('partials.portfolio')
 
+@include('partials.values')
+
 @include('partials.culture')
 
 @include('partials.executive-team')
@@ -312,6 +314,51 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', () => { updatePortfolio(); });
 
     updatePortfolio();
+
+});
+
+
+/* =====================================================
+   VALUES — WHY CHOOSE ROMINA
+===================================================== */
+document.addEventListener('DOMContentLoaded', function () {
+
+    var VALUES = [
+        { name: 'Excellence',   text: 'Striving for superior performance and quality in everything we undertake.' },
+        { name: 'Innovation',   text: 'Committed to continuous creativity and adapting to stay ahead of the curve and the competition.' },
+        { name: 'Quality',      text: 'Providing our customers with the highest standard of products and services available.' },
+        { name: 'Sustainability', text: 'Operating in an environmentally friendly way, protecting our resources for future generations.' },
+        { name: 'Integrity',    text: 'Conducting our business with unwavering honesty, transparency and ethical standards.' }
+    ];
+
+    var items   = document.querySelectorAll('.val-list li');
+    var card    = document.getElementById('valCard');
+    var nameEl  = document.getElementById('valName');
+    var textEl  = document.getElementById('valText');
+
+    if (!items.length || !card) return;
+
+    function activate(index) {
+        items.forEach(function (li, i) {
+            li.classList.toggle('on', i === index);
+            li.querySelector('button').setAttribute('aria-expanded', i === index ? 'true' : 'false');
+        });
+
+        /* re-trigger fadeup animation */
+        card.style.animation = 'none';
+        card.offsetHeight; /* reflow */
+        card.style.animation = '';
+
+        nameEl.textContent = VALUES[index].name;
+        textEl.textContent = VALUES[index].text;
+    }
+
+    items.forEach(function (li, i) {
+        var btn = li.querySelector('button');
+        btn.addEventListener('click',      function () { activate(i); });
+        btn.addEventListener('mouseenter', function () { activate(i); });
+        btn.addEventListener('focus',      function () { activate(i); });
+    });
 
 });
 

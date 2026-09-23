@@ -2400,6 +2400,165 @@ button {
 }
 
 /* =========================================================
+   VALUES — "Why choose Romina" (React exact port)
+========================================================= */
+
+.values-section {
+    background: #F2F4F7;
+    padding: clamp(88px, 12vw, 168px) 0;
+}
+
+.values-section .mark {
+    margin-top: 48px;
+}
+
+.values-wrap {
+    width: 100%;
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 4.4vw, 64px);
+}
+
+.values-grid {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: clamp(40px, 6vw, 100px);
+    align-items: start;
+}
+
+/* ---- left: list ---- */
+
+.val-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.val-list li {
+    border-top: 1px solid rgba(14, 34, 64, .14);
+}
+
+.val-list li:last-child {
+    border-bottom: 1px solid rgba(14, 34, 64, .14);
+}
+
+.val-list button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    padding: 14px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.val-word {
+    font-weight: 300;
+    font-size: clamp(32px, 4.6vw, 68px);
+    line-height: 1.08;
+    letter-spacing: -.025em;
+    color: rgba(14, 34, 64, .32);
+    transition: color .5s cubic-bezier(.16, 1, .3, 1),
+                transform .6s cubic-bezier(.16, 1, .3, 1);
+}
+
+.val-list li.on .val-word {
+    color: #0E2240;
+    transform: translateX(10px);
+}
+
+.val-dot {
+    display: block;
+    flex: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--red);
+    transform: scale(0);
+    transition: transform .5s cubic-bezier(.16, 1, .3, 1);
+}
+
+.val-list li.on .val-dot {
+    transform: scale(1);
+}
+
+.val-inline {
+    display: none;
+}
+
+/* ---- right: sticky card ---- */
+
+.val-side {
+    position: sticky;
+    top: 140px;
+    padding-top: 88px;
+}
+
+.val-card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    animation: val-fadeup .6s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+@keyframes val-fadeup {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: none; }
+}
+
+.val-name {
+    font-weight: 700;
+    font-size: 20px;
+    color: #0E2240;
+    margin: 0;
+}
+
+.val-text {
+    font-weight: 300;
+    font-size: clamp(22px, 2.2vw, 32px);
+    line-height: 1.35;
+    color: #1F1F1F;
+    max-width: 22ch;
+    margin: 0;
+}
+
+/* ---- responsive ≤ 900px ---- */
+
+@media (max-width: 900px) {
+
+    .values-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .val-side {
+        display: none;
+    }
+
+    .val-inline {
+        display: block;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        color: #565656;
+        font-size: 16px;
+        line-height: 1.6;
+        transition: max-height .6s cubic-bezier(.16, 1, .3, 1),
+                    opacity .5s,
+                    padding .5s;
+    }
+
+    .val-list li.on .val-inline {
+        max-height: 160px;
+        opacity: 1;
+        padding-bottom: 18px;
+    }
+
+}
+
+
+/* =========================================================
    CULTURE & LEADERSHIP
 ========================================================= */
 
