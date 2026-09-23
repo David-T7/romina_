@@ -15,7 +15,7 @@
   Site is a SPA — all sections live on the home page via anchor links.
   Sub-page routes commented out in `routes/web.php` (can be uncommented if needed later).
 
-- [ ] **Task 3 — Split the main layout into partials**
+- [x] **Task 3 — Split the main layout into partials**
   `resources/views/layouts/mainlayout.blade.php` is ~2500 lines.
   Break it into `@include` partials under `resources/views/partials/`:
   - `header.blade.php`
@@ -31,7 +31,7 @@
 
   > ⚠️ Agree on these file names with the team **before** starting — Person 2 and Person 3 will be editing those same files.
 
-- [ ] **Task 4 — Implement mobile menu JavaScript**
+- [x] **Task 4 — Implement mobile menu JavaScript**
   The `.mobile-menu-button` (hamburger) is in the header but nothing wires it up.
   - Toggle an `open` class on `.main-navigation` when the button is clicked
   - Close the nav when any nav link is clicked

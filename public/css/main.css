@@ -1001,32 +1001,181 @@ button {
 
 
 /* =====================================================
-   MOBILE MENU
+   MOBILE MENU BUTTON
 ===================================================== */
 
 .mobile-menu-button {
     display: none;
 
-    width: 45px;
-    height: 45px;
+    width: 48px;
+    height: 48px;
 
-    border: 1px solid rgba(255,255,255,.4);
+    place-items: center;
 
     background: transparent;
+    border: 1px solid rgba(255,255,255,.35);
+
+    color: var(--white);
+    font-size: 18px;
 
     cursor: pointer;
+
+    transition: border-color var(--transition);
+}
+
+.mobile-menu-button:hover {
+    border-color: rgba(255,255,255,.75);
 }
 
 
-.mobile-menu-button span {
+/* =====================================================
+   MOBILE NAV OVERLAY
+===================================================== */
+
+.mobile-nav {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+
+    background: var(--deep-blue);
+    color: var(--white);
+
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+
+    /* circle originates from burger button position */
+    clip-path: circle(0% at calc(100% - 34px) 48px);
+    visibility: hidden;
+
+    transition:
+        clip-path .8s cubic-bezier(.77,0,.18,1),
+        visibility 0s linear .8s;
+}
+
+.mobile-nav.open {
+    clip-path: circle(150% at calc(100% - 34px) 48px);
+    visibility: visible;
+
+    transition:
+        clip-path .8s cubic-bezier(.77,0,.18,1),
+        visibility 0s;
+}
+
+
+/* Top bar */
+
+.mobile-nav-top {
+    height: 100px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mobile-nav-close {
+    width: 48px;
+    height: 48px;
+
+    display: grid;
+    place-items: center;
+
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.3);
+
+    color: var(--white);
+    font-size: 20px;
+
+    cursor: pointer;
+
+    transition: border-color var(--transition);
+}
+
+.mobile-nav-close:hover {
+    border-color: rgba(255,255,255,.75);
+}
+
+
+/* Nav links */
+
+.mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 24px;
+}
+
+.mobile-nav-links a {
     display: block;
 
-    width: 20px;
-    height: 2px;
+    font-size: clamp(36px, 10vw, 52px);
+    font-weight: 300;
+    letter-spacing: -.02em;
+    line-height: 1.2;
 
-    margin: 4px auto;
+    color: var(--white);
 
-    background: var(--white);
+    opacity: 0;
+    transform: translateY(24px);
+
+    transition:
+        opacity .6s var(--transition),
+        transform .6s var(--transition),
+        color .25s;
+}
+
+.mobile-nav.open .mobile-nav-links a {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(.25s + var(--d));
+}
+
+.mobile-nav-links a:hover {
+    color: var(--red);
+}
+
+
+/* Brand pills */
+
+.mobile-nav-brands {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin-top: 36px;
+}
+
+.mobile-nav-brands span {
+    font-size: 14px;
+    color: rgba(255,255,255,.5);
+
+    transition: color var(--transition);
+}
+
+.mobile-nav-brands span:hover {
+    color: rgba(255,255,255,.9);
+    cursor: default;
+}
+
+
+/* Footer */
+
+.mobile-nav-foot {
+    margin-top: auto;
+    padding: 36px 0;
+
+    border-top: 1px solid rgba(255,255,255,.12);
+}
+
+.mobile-nav-foot a {
+    font-size: 14px;
+    color: rgba(255,255,255,.55);
+
+    transition: color var(--transition);
+}
+
+.mobile-nav-foot a:hover {
+    color: var(--white);
 }
 
 
@@ -1072,7 +1221,7 @@ button {
 
 
     .mobile-menu-button {
-        display: block;
+        display: grid;
     }
 
 

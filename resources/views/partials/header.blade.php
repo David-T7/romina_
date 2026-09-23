@@ -107,11 +107,49 @@
         </nav>
 
         <!-- Mobile Menu Button -->
-        <button class="mobile-menu-button" aria-label="Open menu">
-            <span></span>
-            <span></span>
-            <span></span>
+        <button class="mobile-menu-button" id="menuOpen" aria-label="Open menu">
+            <i class="fa-solid fa-bars"></i>
         </button>
 
     </div>
 </header>
+
+
+<!-- ==========================================
+     MOBILE NAV OVERLAY
+=========================================== -->
+
+<div class="mobile-nav" id="mobileNav" aria-hidden="true">
+
+    <div class="container mobile-nav-top">
+        <a href="/" class="logo">
+            <img src="{{ asset('images/logo/logo-white.png') }}" alt="Romina Group">
+        </a>
+        <button class="mobile-nav-close" id="menuClose" aria-label="Close menu">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <nav class="container mobile-nav-links" aria-label="Mobile navigation">
+        <a href="#about"          style="--d: 0ms">About</a>
+        <a href="#businesses"     style="--d: 50ms">Businesses</a>
+        <a href="#sustainability" style="--d: 100ms">Sustainability</a>
+        <a href="#careers"        style="--d: 150ms">Careers</a>
+        <a href="#news"           style="--d: 200ms">News</a>
+        <a href="#contact"        style="--d: 250ms">Contact</a>
+    </nav>
+
+    <div class="container mobile-nav-brands">
+        <span>Romina Restaurants</span>
+        <span>KOBA</span>
+        <span>Meskott</span>
+        <span>Romina Coffee</span>
+        <span>Romina Imports</span>
+        <span>Jaquar World</span>
+    </div>
+
+    <div class="container mobile-nav-foot">
+        <a href="mailto:info@rominaplc.com">info@rominaplc.com</a>
+    </div>
+
+</div>

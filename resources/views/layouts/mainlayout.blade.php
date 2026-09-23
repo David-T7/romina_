@@ -51,6 +51,45 @@
 
 
 <script>
+/* =====================================================
+   MOBILE NAV
+===================================================== */
+document.addEventListener('DOMContentLoaded', function () {
+
+    const openBtn  = document.getElementById('menuOpen');
+    const closeBtn = document.getElementById('menuClose');
+    const mobileNav = document.getElementById('mobileNav');
+    const navLinks = document.querySelectorAll('.mobile-nav-links a');
+
+    function openMenu() {
+        mobileNav.classList.add('open');
+        mobileNav.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+        mobileNav.classList.remove('open');
+        mobileNav.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+
+    openBtn.addEventListener('click', openMenu);
+    closeBtn.addEventListener('click', closeMenu);
+
+    navLinks.forEach(function (link) {
+        link.addEventListener('click', closeMenu);
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeMenu();
+    });
+
+});
+
+
+/* =====================================================
+   HERO SLIDER
+===================================================== */
 document.addEventListener('DOMContentLoaded', function () {
 
     const slides = document.querySelectorAll('.hero-slide');
