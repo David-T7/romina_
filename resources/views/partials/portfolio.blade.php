@@ -70,7 +70,7 @@
                         </div>
 
 
-                        <a href="#" class="portfolio-link">
+                        <a href="#brands" class="portfolio-link">
                             Explore our restaurants
                             <span><i class="fa-solid fa-arrow-right"></i></span>
                         </a>
@@ -124,7 +124,7 @@
                         </div>
 
 
-                        <a href="#" class="portfolio-link">
+                        <a href="#brands" class="portfolio-link">
                             Explore Romina Coffee
                             <span><i class="fa-solid fa-arrow-right"></i></span>
                         </a>
@@ -175,7 +175,7 @@
                         </div>
 
 
-                        <a href="#" class="portfolio-link">
+                        <a href="#brands" class="portfolio-link">
                             Explore our ventures
                             <span><i class="fa-solid fa-arrow-right"></i></span>
                         </a>
@@ -229,7 +229,7 @@
                         </div>
 
 
-                        <a href="#" class="portfolio-link">
+                        <a href="#brands" class="portfolio-link">
                             Explore our properties
                             <span><i class="fa-solid fa-arrow-right"></i></span>
                         </a>

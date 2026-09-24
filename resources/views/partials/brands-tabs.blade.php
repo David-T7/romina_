@@ -45,7 +45,7 @@
             ],
             'phone'  => '+251 900 989 898',
             'cta'    => 'Visit KOBA',
-            'href'   => null,
+            'href'   => "https://kobapatisserie.com/",
             'slides' => [
                 ['src' => null, 'shot' => 'KOBA pastry counter, morning light',         'caption' => 'The pastry counter', 'pos' => '50% 50%'],
                 ['src' => null, 'shot' => 'Handcrafted celebration cake, close detail', 'caption' => 'Handcrafted cakes',  'pos' => '50% 50%'],

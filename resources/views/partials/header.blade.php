@@ -35,17 +35,17 @@
                             Restaurants &amp; Culinary Brands
                         </span>
 
-                        <a href="#">
+                        <a href="#brands">
                             Restaurant Brands
                             <small>Explore <span><i class="fa-solid fa-arrow-right"></i></span></small>
                         </a>
 
-                        <a href="#">
+                        <a href="#brands">
                             Hospitality
                             <small>Explore <span><i class="fa-solid fa-arrow-right"></i></span></small>
                         </a>
 
-                        <a href="#">
+                        <a href="#brands">
                             Food &amp; Beverage
                             <small>Explore <span><i class="fa-solid fa-arrow-right"></i></span></small>
                         </a>
@@ -56,17 +56,17 @@
                             Romina Coffee
                         </span>
 
-                        <a href="#">
+                        <a href="#brands">
                             Our Coffee
                             <small>Explore <span><i class="fa-solid fa-arrow-right"></i></span></small>
                         </a>
 
-                        <a href="#">
+                        <a href="#brands">
                             Coffee Shops
                             <small>Explore <span><i class="fa-solid fa-arrow-right"></i></span></small>
                         </a>
 
-                        <a href="#">
+                        <a href="#about">
                             Our Story
                             <small>Explore <span><i class="fa-solid fa-arrow-right"></i></span></small>
                         </a>
@@ -77,17 +77,17 @@
                             Other Businesses
                         </span>
 
-                        <a href="#">
+                        <a href="#brands">
                             Real Estate
                             <small>Explore <span><i class="fa-solid fa-arrow-right"></i></span></small>
                         </a>
 
-                        <a href="#">
+                        <a href="#brands">
                             Investments
                             <small>Explore <span><i class="fa-solid fa-arrow-right"></i></span></small>
                         </a>
 
-                        <a href="#">
+                        <a href="#brands">
                             Consumer Brands
                             <small>Explore <span><i class="fa-solid fa-arrow-right"></i></span></small>
                         </a>
