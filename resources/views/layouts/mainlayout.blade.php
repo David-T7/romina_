@@ -150,45 +150,341 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 /* =====================================================
-   TIMELINE
+   Our story — timeline autoplay (desktop + mobile staircase)
 ===================================================== */
 document.addEventListener('DOMContentLoaded', function () {
 
-    const TIMELINE = [
-        { year: '1973', text: 'Girma Taye opens a small, cherished restaurant in Arat Kilo, in the heart of Addis Ababa.' },
-        { year: '2009', text: 'Romina Coffee launches, taking Ethiopian Arabica to Europe, the USA, Asia and the Middle East.' },
-        { year: '2017', text: 'A partnership between Jaquar Group and Romina Group opens Jaquar World Addis Ababa.' },
-        { year: '2020', text: 'KOBA Patisserie & Bakery is established, built on craftsmanship and artisan baking.' },
+    var TIMELINE = [
+        { year: '1973',  text: 'Girma Taye opens a small, cherished restaurant in Arat Kilo, in the heart of Addis Ababa.' },
+        { year: '2009',  text: 'Romina Coffee launches, taking Ethiopian Arabica to Europe, the USA, Asia and the Middle East.' },
+        { year: '2017',  text: 'A partnership between Jaquar Group and Romina Group opens Jaquar World Addis Ababa.' },
+        { year: '2020',  text: 'KOBA Patisserie & Bakery is established, built on craftsmanship and artisan baking.' },
         { year: 'Today', text: 'A diversified Ethiopian group spanning hospitality, coffee export, international trading, importing and distribution.' },
     ];
 
-    const nodes  = document.querySelectorAll('.tl-node');
-    const dot    = document.getElementById('tlDot');
-    const detail = document.getElementById('tlDetail');
-    const big    = document.getElementById('tlBig');
-    const text   = document.getElementById('tlText');
+    var nodes  = document.querySelectorAll('.tl-node');
+    var dot    = document.getElementById('tlDot');
+    var detail = document.getElementById('tlDetail');
+    var big    = document.getElementById('tlBig');
+    var text   = document.getElementById('tlText');
+    var rail   = document.querySelector('.tl-rail');
 
-    if (!nodes.length || !dot || !detail) return;
+    if (!nodes.length || !rail) return;
+
+    var prefRed = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function activate(index) {
         nodes.forEach(function (n, i) {
-            n.classList.toggle('on', i === index);
+            n.classList.toggle('on',   i === index);
+            n.classList.toggle('past', i < index);
             n.setAttribute('aria-pressed', i === index ? 'true' : 'false');
+            n.setAttribute('aria-current', i === index ? 'step' : 'false');
         });
-
-        dot.style.left = ((index / (TIMELINE.length - 1)) * 100) + '%';
-
-        detail.classList.remove('tl-animate');
-        void detail.offsetWidth;
-        detail.classList.add('tl-animate');
-
-        big.textContent  = TIMELINE[index].year;
-        text.textContent = TIMELINE[index].text;
+        if (dot)    dot.style.left = ((index / (TIMELINE.length - 1)) * 100) + '%';
+        if (detail) { detail.classList.remove('tl-animate'); void detail.offsetWidth; detail.classList.add('tl-animate'); }
+        if (big)    big.textContent  = TIMELINE[index].year;
+        if (text)   text.textContent = TIMELINE[index].text;
     }
 
-    nodes.forEach(function (node) {
-        node.addEventListener('click',      function () { activate(+node.dataset.index); });
-        node.addEventListener('mouseenter', function () { activate(+node.dataset.index); });
+    /* ================================================================
+       DESKTOP CONTROLLER  (≥769px)
+       Auto-advances every 3 s. Hover pauses; resumes 4 s after leave.
+       Click/keyboard stops; resumes 8 s after last interaction.
+    ================================================================ */
+    function initDesktop() {
+        var autoIdx     = 0;
+        var autoTimer   = null;
+        var resumeTimer = null;
+        var isVisible   = false;
+        var io          = null;
+
+        function schedule() {
+            clearTimeout(autoTimer);
+            if (!isVisible) return;
+            autoTimer = setTimeout(function () {
+                autoIdx = (autoIdx + 1) % TIMELINE.length;
+                activate(autoIdx);
+                schedule();
+            }, 3000);
+        }
+
+        function pause() { clearTimeout(autoTimer); }
+
+        function scheduleResume(ms) {
+            clearTimeout(resumeTimer);
+            clearTimeout(autoTimer);
+            resumeTimer = setTimeout(schedule, ms);
+        }
+
+        nodes.forEach(function (node) {
+            var idx = +node.dataset.index;
+
+            /* Hover: pause, show this milestone */
+            node.addEventListener('mouseenter', function () {
+                clearTimeout(resumeTimer);
+                pause();
+                activate(idx);
+                autoIdx = idx;
+            });
+            node.addEventListener('mouseleave', function () { scheduleResume(4000); });
+
+            /* Click: activate + long resume */
+            node.addEventListener('click', function () {
+                activate(idx);
+                autoIdx = idx;
+                scheduleResume(8000);
+            });
+
+            /* Keyboard focus behaves like hover */
+            node.addEventListener('focus', function () {
+                clearTimeout(resumeTimer);
+                pause();
+                activate(idx);
+                autoIdx = idx;
+            });
+            node.addEventListener('blur',  function () { scheduleResume(4000); });
+            node.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    activate(idx);
+                    autoIdx = idx;
+                    scheduleResume(8000);
+                }
+            });
+        });
+
+        function onEnter() {
+            isVisible = true;
+            if (!rail.classList.contains('tl-entered')) rail.classList.add('tl-entered');
+            activate(autoIdx);
+            schedule();
+        }
+        function onLeave() { isVisible = false; pause(); }
+
+        if (typeof IntersectionObserver !== 'undefined') {
+            io = new IntersectionObserver(function (entries) {
+                entries[0].isIntersecting ? onEnter() : onLeave();
+            }, { threshold: 0.2 });
+            io.observe(rail);
+        } else {
+            onEnter();
+        }
+
+        return {
+            onVisibility: function (hidden) {
+                if (hidden) pause();
+                else if (isVisible) schedule();
+            },
+            destroy: function () {
+                pause();
+                clearTimeout(resumeTimer);
+                if (io) io.disconnect();
+                rail.classList.remove('tl-entered');
+            }
+        };
+    }
+
+    /* ================================================================
+       MOBILE CONTROLLER  (≤768px)
+       Ball bounces 1973→…→Today→loop. Tap stops ball; resumes after 8 s.
+    ================================================================ */
+    function initMobile() {
+
+        /* Reduced motion: instant tap only, no ball */
+        if (prefRed) {
+            nodes.forEach(function (node) {
+                node.addEventListener('click', function () { activate(+node.dataset.index); });
+                node.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(+node.dataset.index); }
+                });
+            });
+            rail.classList.add('tl-entered');
+            activate(0);
+            return { onVisibility: function () {}, destroy: function () {} };
+        }
+
+        var ball        = null;
+        var ballX = 0, ballY = 0;
+        var stepIndex   = 0;
+        var autoTimer   = null;
+        var resumeTimer = null;
+        var entrTimer   = null;
+        var hopRaf      = null;
+        var autoPlaying = false;
+        var isVisible   = false;
+        var io          = null;
+
+        /* Landing: right-top corner of each step (tread/riser junction) */
+        function getLanding(i) {
+            var rr = rail.getBoundingClientRect();
+            var nr = nodes[i].getBoundingClientRect();
+            return { x: nr.right - rr.left, y: nr.top - rr.top };
+        }
+
+        function placeBall(x, y) {
+            ballX = x; ballY = y;
+            ball.style.transform = 'translate(' + (x - 7) + 'px,' + (y - 14) + 'px)';
+        }
+
+        function cancelHop() {
+            if (hopRaf) { cancelAnimationFrame(hopRaf); hopRaf = null; }
+        }
+
+        function squash(x, y) {
+            if (typeof ball.animate !== 'function') return;
+            var p = 'translate(' + (x - 7) + 'px,' + (y - 14) + 'px)';
+            ball.animate(
+                [{ transform: p + ' scaleX(1.15) scaleY(0.8)' }, { transform: p }],
+                { duration: 80, easing: 'ease-out' }
+            );
+        }
+
+        function hopTo(toX, toY, dur, onDone) {
+            cancelHop();
+            var sx = ballX, sy = ballY, dx = toX - sx, dy = toY - sy;
+            var arcH = Math.min(80 + Math.abs(dx) * 0.15 + Math.abs(dy) * 0.1, 100);
+            var t0   = performance.now();
+            (function tick(now) {
+                var raw  = Math.min((now - t0) / dur, 1);
+                var ease = raw < 0.5 ? 2 * raw * raw : -1 + (4 - 2 * raw) * raw;
+                var x    = sx + dx * ease;
+                var y    = sy + dy * ease - arcH * Math.sin(Math.PI * raw);
+                ball.style.transform = 'translate(' + (x - 7) + 'px,' + (y - 14) + 'px)';
+                if (raw < 1) {
+                    hopRaf = requestAnimationFrame(tick);
+                } else {
+                    hopRaf = null; ballX = toX; ballY = toY;
+                    squash(toX, toY);
+                    if (onDone) onDone();
+                }
+            })(performance.now());
+        }
+
+        function moveTo(i, dur, done) {
+            var lp = getLanding(i);
+            hopTo(lp.x, lp.y, dur, function () {
+                activate(i); stepIndex = i;
+                if (done) done();
+            });
+        }
+
+        function scheduleNext() {
+            if (!autoPlaying) return;
+            clearTimeout(autoTimer);
+            autoTimer = setTimeout(function () {
+                if (!autoPlaying) return;
+                moveTo((stepIndex + 1) % TIMELINE.length, 550, scheduleNext);
+            }, 1800);
+        }
+
+        function startAutoplay() {
+            if (autoPlaying || !ball) return;
+            autoPlaying = true;
+            scheduleNext();
+        }
+
+        function stopAutoplay() {
+            autoPlaying = false;
+            clearTimeout(autoTimer);
+            cancelHop();
+        }
+
+        /* Tap: jump to step, then resume autoplay after 8 s */
+        nodes.forEach(function (node) {
+            node.addEventListener('click', function () {
+                var idx = +node.dataset.index;
+                stopAutoplay();
+                clearTimeout(resumeTimer);
+                if (ball) moveTo(idx, 300, null);
+                else { activate(idx); stepIndex = idx; }
+                resumeTimer = setTimeout(startAutoplay, 8000);
+            });
+            node.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); node.click(); }
+            });
+        });
+
+        function onEnter() {
+            isVisible = true;
+            if (!rail.classList.contains('tl-entered')) {
+                rail.classList.add('tl-entered');
+                /* Wait out entrance animation (320ms delay + 500ms duration) */
+                entrTimer = setTimeout(function () {
+                    ball = document.createElement('span');
+                    ball.className = 'tl-ball';
+                    ball.setAttribute('aria-hidden', 'true');
+                    rail.appendChild(ball);
+                    rail.classList.add('tl-has-ball');
+                    var lp = getLanding(0);
+                    placeBall(lp.x, lp.y);
+                    activate(0); stepIndex = 0;
+                    startAutoplay();
+                }, 860);
+            } else if (ball) {
+                startAutoplay();
+            }
+        }
+
+        function onLeave() {
+            isVisible = false;
+            clearTimeout(entrTimer);
+            stopAutoplay();
+        }
+
+        if (typeof IntersectionObserver !== 'undefined') {
+            io = new IntersectionObserver(function (entries) {
+                entries[0].isIntersecting ? onEnter() : onLeave();
+            }, { threshold: 0.15 });
+            io.observe(rail);
+        } else {
+            rail.classList.add('tl-entered');
+        }
+
+        window.addEventListener('resize', function () {
+            if (!ball) return;
+            stopAutoplay();
+            placeBall(getLanding(stepIndex).x, getLanding(stepIndex).y);
+            if (isVisible) setTimeout(startAutoplay, 300);
+        });
+
+        return {
+            onVisibility: function (hidden) {
+                if (hidden) stopAutoplay();
+                else if (isVisible) startAutoplay();
+            },
+            destroy: function () {
+                stopAutoplay();
+                clearTimeout(entrTimer);
+                clearTimeout(resumeTimer);
+                if (io) io.disconnect();
+                if (ball && ball.parentNode) { ball.parentNode.removeChild(ball); ball = null; }
+                rail.classList.remove('tl-entered', 'tl-has-ball');
+            }
+        };
+    }
+
+    /* ================================================================
+       BOOTSTRAP — one controller at a time, hot-swap on breakpoint cross
+    ================================================================ */
+    var mq   = window.matchMedia('(max-width: 768px)');
+    var ctrl = null;
+
+    function boot() {
+        if (ctrl) ctrl.destroy();
+        ctrl = mq.matches ? initMobile() : initDesktop();
+    }
+
+    /* addEventListener preferred; addListener is the legacy Safari fallback */
+    if (typeof mq.addEventListener === 'function') {
+        mq.addEventListener('change', boot);
+    } else {
+        mq.addListener(boot);
+    }
+
+    boot();
+
+    document.addEventListener('visibilitychange', function () {
+        if (ctrl) ctrl.onVisibility(document.hidden);
     });
 
 });
@@ -799,129 +1095,83 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /* =====================================================
-   LATEST NEWS — category filter + JS-rendered grid + modal
+   ACCOMPLISHMENTS — swipe carousel
 ===================================================== */
 document.addEventListener('DOMContentLoaded', function () {
 
-    var section = document.getElementById('news');
+    var section = document.getElementById('accomplishments');
     if (!section) return;
 
-    var dataEl   = document.getElementById('newsJson');
-    if (!dataEl) return;
-    var allItems = JSON.parse(dataEl.textContent);
+    var track   = document.getElementById('acTrack');
+    if (!track) return;
 
-    var activeCat = 'All';
-    var overlay   = document.getElementById('newsOverlay');
-    var closeBtn  = document.getElementById('newsDialogClose');
+    var cards   = Array.from(track.querySelectorAll('.ac-card'));
+    var prevBtn = section.querySelector('.ac-prev');
+    var nextBtn = section.querySelector('.ac-next');
+    var dot     = section.querySelector('.ac-progress-dot');
+    var ptrack  = section.querySelector('.ac-progress-track');
 
-    /* ---- placeholder image HTML ---- */
-    function makePh(shot, small) {
-        return '<div class="news-ph" aria-label="Image placeholder: ' + esc(shot) + '" role="img">' +
-            '<span class="news-ph-tag"><i></i>PHOTOGRAPH REQUIRED</span>' +
-            '<span class="news-ph-shot">' + escHtml(shot) + '</span>' +
-        '</div>';
+    /* ----- progress dot ----- */
+    function updateProgress() {
+        var max = track.scrollWidth - track.clientWidth;
+        if (max <= 0 || !dot || !ptrack) return;
+        var pct  = track.scrollLeft / max;
+        var room = ptrack.offsetWidth - 9;
+        dot.style.left = Math.round(pct * room) + 'px';
     }
 
-    /* ---- arrow-right SVG ---- */
-    var arrowSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>';
+    track.addEventListener('scroll', updateProgress, { passive: true });
 
-    /* ---- safe string helpers ---- */
-    function esc(s) {
-        return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
-    function escHtml(s) {
-        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    /* ----- arrow scroll ----- */
+    function scrollCards(dir) {
+        var w = cards[0] ? cards[0].offsetWidth + 16 : 356;
+        track.scrollBy({ left: dir * w, behavior: 'smooth' });
     }
 
-    /* ---- render grid ---- */
-    function renderGrid() {
-        var body  = document.getElementById('newsBody');
-        var items = activeCat === 'All' ? allItems : allItems.filter(function (n) { return n.cat === activeCat; });
+    if (prevBtn) prevBtn.addEventListener('click', function () { scrollCards(-1); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { scrollCards(1); });
 
-        if (!items.length) {
-            body.innerHTML =
-                '<div class="news-empty">' +
-                    '<p>No ' + escHtml(activeCat.toLowerCase()) + ' stories yet.</p>' +
-                    '<button class="link-cta" id="newsShowAll">Show all stories ' + arrowSvg + '</button>' +
-                '</div>';
-            var showAll = document.getElementById('newsShowAll');
-            if (showAll) showAll.addEventListener('click', function () { setFilter('All'); });
-            return;
-        }
-
-        var lead = items[0];
-        var rest = items.slice(1);
-
-        var leadHtml =
-            '<article class="news-lead" tabindex="0" data-cat="' + esc(lead.cat) + '" data-title="' + esc(lead.title) + '" data-shot="' + esc(lead.shot) + '">' +
-                '<div class="news-img">' + makePh(lead.shot) + '</div>' +
-                '<p class="news-meta"><span>' + escHtml(lead.cat) + '</span><span>Date to be confirmed</span></p>' +
-                '<h3>' + escHtml(lead.title) + '</h3>' +
-                '<button class="link-cta" tabindex="-1" aria-hidden="true">Read more ' + arrowSvg + '</button>' +
-            '</article>';
-
-        var restHtml = '';
-        if (rest.length) {
-            var rowsHtml = rest.map(function (n) {
-                return '<article class="news-row" tabindex="0" data-cat="' + esc(n.cat) + '" data-title="' + esc(n.title) + '" data-shot="' + esc(n.shot) + '">' +
-                    '<div class="news-thumb">' + makePh(n.shot, true) + '</div>' +
-                    '<div>' +
-                        '<p class="news-meta"><span>' + escHtml(n.cat) + '</span><span>Date to be confirmed</span></p>' +
-                        '<h4>' + escHtml(n.title) + '</h4>' +
-                    '</div>' +
-                '</article>';
-            }).join('');
-            restHtml = '<div class="news-rest">' + rowsHtml + '</div>';
-        }
-
-        body.innerHTML = '<div class="news-grid">' + leadHtml + restHtml + '</div>';
-
-        /* attach click + keyboard handlers */
-        body.querySelectorAll('.news-lead, .news-row').forEach(function (art) {
-            function open() {
-                openDialog({ cat: art.dataset.cat, title: art.dataset.title, shot: art.dataset.shot });
-            }
-            art.addEventListener('click', open);
-            art.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
-        });
-    }
-
-    /* ---- category filter ---- */
-    function setFilter(cat) {
-        activeCat = cat;
-        section.querySelectorAll('.chips button').forEach(function (btn) {
-            var on = btn.dataset.chip === cat;
-            btn.classList.toggle('on', on);
-            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-        });
-        renderGrid();
-    }
-
-    section.querySelectorAll('.chips button').forEach(function (btn) {
-        btn.addEventListener('click', function () { setFilter(btn.dataset.chip); });
+    /* ----- keyboard on track ----- */
+    track.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { e.preventDefault(); scrollCards(1); }
+        if (e.key === 'ArrowLeft')  { e.preventDefault(); scrollCards(-1); }
     });
 
-    /* ---- modal ---- */
-    function openDialog(item) {
-        document.getElementById('newsDialogImg').innerHTML   = makePh(item.shot);
-        document.getElementById('newsDialogMeta').innerHTML  = '<span>' + escHtml(item.cat) + '</span><span>Date to be confirmed</span>';
-        document.getElementById('newsDialogTitle').textContent = item.title;
-        overlay.hidden = false;
-        document.body.style.overflow = 'hidden';
-        closeBtn.focus();
+    /* ----- mouse drag-to-scroll ----- */
+    var dragging = false, startX = 0, startScroll = 0;
+
+    track.addEventListener('pointerdown', function (e) {
+        if (e.pointerType === 'touch') return;
+        dragging = true;
+        startX = e.clientX;
+        startScroll = track.scrollLeft;
+        track.setPointerCapture(e.pointerId);
+        track.style.cursor = 'grabbing';
+    });
+    track.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        track.scrollLeft = startScroll - (e.clientX - startX);
+    });
+    track.addEventListener('pointerup',     function () { dragging = false; track.style.cursor = ''; });
+    track.addEventListener('pointercancel', function () { dragging = false; track.style.cursor = ''; });
+
+    /* ----- entrance stagger (once) ----- */
+    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!prefersReduced && typeof IntersectionObserver !== 'undefined') {
+        var io = new IntersectionObserver(function (entries) {
+            if (!entries[0].isIntersecting) return;
+            cards.forEach(function (card, i) {
+                setTimeout(function () { card.classList.add('ac-visible'); }, i * 100);
+            });
+            io.disconnect();
+        }, { threshold: 0.1 });
+        io.observe(section);
+    } else {
+        cards.forEach(function (c) { c.classList.add('ac-visible'); });
     }
 
-    function closeDialog() {
-        overlay.hidden = true;
-        document.body.style.overflow = '';
-    }
-
-    closeBtn.addEventListener('click', closeDialog);
-    overlay.addEventListener('click', function (e) { if (e.target === overlay) closeDialog(); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !overlay.hidden) closeDialog(); });
-
-    /* ---- initial render ---- */
-    renderGrid();
+    updateProgress();
 
 });
 

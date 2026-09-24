@@ -98,7 +98,7 @@
 
             <a href="#sustainability">Sustainability</a>
             <a href="#careers">Careers</a>
-            <a href="#news">News</a>
+            <a href="#accomplishments">News</a>
             <a href="#contact">Contact</a>
 
             <a href="#contact" class="talk-button">
@@ -120,7 +120,7 @@
      MOBILE NAV OVERLAY
 =========================================== -->
 
-<div class="mobile-nav" id="mobileNav" aria-hidden="true">
+<div class="mobile-nav mobile-menu--centered" id="mobileNav" aria-hidden="true">
 
     <div class="container mobile-nav-top">
         <a href="/" class="logo">
@@ -132,12 +132,12 @@
     </div>
 
     <nav class="container mobile-nav-links" aria-label="Mobile navigation">
-        <a href="#about"          style="--d: 0ms">About</a>
-        <a href="#businesses"     style="--d: 50ms">Businesses</a>
-        <a href="#sustainability" style="--d: 100ms">Sustainability</a>
-        <a href="#careers"        style="--d: 150ms">Careers</a>
-        <a href="#news"           style="--d: 200ms">News</a>
-        <a href="#contact"        style="--d: 250ms">Contact</a>
+        <a href="#about"          style="--d: 0ms"  aria-current="page"><span>About</span></a>
+        <a href="#businesses"     style="--d: 50ms"><span>Businesses</span></a>
+        <a href="#sustainability" style="--d: 100ms"><span>Sustainability</span></a>
+        <a href="#careers"        style="--d: 150ms"><span>Careers</span></a>
+        <a href="#accomplishments" style="--d: 200ms"><span>News</span></a>
+        <a href="#contact"        style="--d: 250ms"><span>Contact</span></a>
     </nav>
 
     <div class="container mobile-nav-brands">
