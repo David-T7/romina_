@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 /* =====================================================
-   TIMELINE
+   TIMELINE / Our story staircase
 ===================================================== */
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -167,28 +167,206 @@ document.addEventListener('DOMContentLoaded', function () {
     const detail = document.getElementById('tlDetail');
     const big    = document.getElementById('tlBig');
     const text   = document.getElementById('tlText');
+    const rail   = document.querySelector('.tl-rail');
 
     if (!nodes.length || !dot || !detail) return;
 
     function activate(index) {
         nodes.forEach(function (n, i) {
-            n.classList.toggle('on', i === index);
+            n.classList.toggle('on',   i === index);
+            n.classList.toggle('past', i < index);
             n.setAttribute('aria-pressed', i === index ? 'true' : 'false');
+            n.setAttribute('aria-current', i === index ? 'step' : 'false');
         });
-
         dot.style.left = ((index / (TIMELINE.length - 1)) * 100) + '%';
-
         detail.classList.remove('tl-animate');
         void detail.offsetWidth;
         detail.classList.add('tl-animate');
-
         big.textContent  = TIMELINE[index].year;
         text.textContent = TIMELINE[index].text;
     }
 
+    var isMobile       = window.matchMedia('(max-width: 768px)').matches;
+    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---- Desktop: hover + click ---- */
+    if (!isMobile) {
+        nodes.forEach(function (node) {
+            node.addEventListener('click',      function () { activate(+node.dataset.index); });
+            node.addEventListener('mouseenter', function () { activate(+node.dataset.index); });
+        });
+        if (rail) rail.classList.add('tl-entered');
+        return;
+    }
+
+    /* ---- Mobile reduced-motion: tap only, no ball ---- */
+    if (prefersReduced) {
+        nodes.forEach(function (node) {
+            node.addEventListener('click', function () { activate(+node.dataset.index); });
+        });
+        if (rail) { rail.classList.add('tl-entered'); activate(0); }
+        return;
+    }
+
+    /* ---- Mobile: bouncing ball autoplay ---- */
+    var ball        = null;   // <span class="tl-ball"> created after entrance anim
+    var ballX       = 0;      // bottom-center x relative to rail
+    var ballY       = 0;      // bottom y relative to rail (= tread line)
+    var stepIndex   = 0;
+    var autoTimer   = null;
+    var entrTimer   = null;
+    var hopRaf      = null;
+    var autoPlaying = false;
+    var userCtrl    = false;
+    var isVisible   = false;
+
+    /* Landing point: right-top corner of step (tread/riser junction) */
+    function getLanding(i) {
+        var rr = rail.getBoundingClientRect();
+        var nr = nodes[i].getBoundingClientRect();
+        return { x: nr.right - rr.left, y: nr.top - rr.top };
+    }
+
+    /* Place ball instantly (bottom-center at x,y) */
+    function placeBall(x, y) {
+        ballX = x; ballY = y;
+        ball.style.transform = 'translate(' + (x - 7) + 'px,' + (y - 14) + 'px)';
+    }
+
+    function cancelHop() {
+        if (hopRaf) { cancelAnimationFrame(hopRaf); hopRaf = null; }
+    }
+
+    /* Squash on landing using Web Animations API */
+    function squash(x, y) {
+        if (typeof ball.animate !== 'function') return;
+        var p = 'translate(' + (x - 7) + 'px,' + (y - 14) + 'px)';
+        ball.animate(
+            [{ transform: p + ' scaleX(1.15) scaleY(0.8)' }, { transform: p }],
+            { duration: 80, easing: 'ease-out' }
+        );
+    }
+
+    /* Arc hop via requestAnimationFrame */
+    function hopTo(toX, toY, dur, onDone) {
+        cancelHop();
+        var sx = ballX, sy = ballY;
+        var dx = toX - sx, dy = toY - sy;
+        /* Arc height: upward arc regardless of direction, capped for long jumps */
+        var arcH = Math.min(80 + Math.abs(dx) * 0.15 + Math.abs(dy) * 0.1, 100);
+        var t0   = performance.now();
+
+        function tick(now) {
+            var raw  = Math.min((now - t0) / dur, 1);
+            var ease = raw < 0.5 ? 2 * raw * raw : -1 + (4 - 2 * raw) * raw;
+            var x    = sx + dx * ease;
+            var y    = sy + dy * ease - arcH * Math.sin(Math.PI * raw);
+            ball.style.transform = 'translate(' + (x - 7) + 'px,' + (y - 14) + 'px)';
+            if (raw < 1) {
+                hopRaf = requestAnimationFrame(tick);
+            } else {
+                hopRaf = null;
+                ballX = toX; ballY = toY;
+                squash(toX, toY);
+                if (onDone) onDone();
+            }
+        }
+        hopRaf = requestAnimationFrame(tick);
+    }
+
+    /* Hop ball to step i, then activate it */
+    function moveTo(i, dur, done) {
+        var lp = getLanding(i);
+        hopTo(lp.x, lp.y, dur, function () {
+            activate(i);
+            stepIndex = i;
+            if (done) done();
+        });
+    }
+
+    function scheduleNext() {
+        if (!autoPlaying) return;
+        clearTimeout(autoTimer);
+        autoTimer = setTimeout(function () {
+            if (!autoPlaying) return;
+            moveTo((stepIndex + 1) % TIMELINE.length, 550, scheduleNext);
+        }, 1600);
+    }
+
+    function startAutoplay() {
+        if (autoPlaying || !ball) return;
+        autoPlaying = true;
+        scheduleNext();
+    }
+
+    function stopAutoplay() {
+        autoPlaying = false;
+        clearTimeout(autoTimer);
+        cancelHop();
+    }
+
+    /* Tap: hand control to user */
     nodes.forEach(function (node) {
-        node.addEventListener('click',      function () { activate(+node.dataset.index); });
-        node.addEventListener('mouseenter', function () { activate(+node.dataset.index); });
+        node.addEventListener('click', function () {
+            var idx = +node.dataset.index;
+            stopAutoplay();
+            userCtrl = true;
+            if (ball) moveTo(idx, 300, null);
+            else { activate(idx); stepIndex = idx; }
+        });
+    });
+
+    /* Enter viewport: run entrance anim, then create ball and start autoplay */
+    function onEnter() {
+        isVisible = true;
+        if (!rail.classList.contains('tl-entered')) {
+            rail.classList.add('tl-entered');
+            /* Wait for last step's entrance anim: 320ms delay + 500ms = 820ms */
+            entrTimer = setTimeout(function () {
+                ball = document.createElement('span');
+                ball.className = 'tl-ball';
+                ball.setAttribute('aria-hidden', 'true');
+                rail.appendChild(ball);
+                rail.classList.add('tl-has-ball');
+                var lp = getLanding(0);
+                placeBall(lp.x, lp.y);
+                activate(0);
+                stepIndex = 0;
+                if (!userCtrl) startAutoplay();
+            }, 860);
+        } else if (ball && !userCtrl) {
+            startAutoplay();
+        }
+    }
+
+    function onLeave() {
+        isVisible = false;
+        clearTimeout(entrTimer);
+        stopAutoplay();
+    }
+
+    if (typeof IntersectionObserver !== 'undefined') {
+        var io = new IntersectionObserver(function (entries) {
+            if (entries[0].isIntersecting) onEnter(); else onLeave();
+        }, { threshold: 0.15 });
+        io.observe(rail);
+    } else {
+        rail.classList.add('tl-entered');
+    }
+
+    /* Pause when tab loses focus */
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) { stopAutoplay(); }
+        else if (isVisible && !userCtrl) { startAutoplay(); }
+    });
+
+    /* Reposition ball on resize */
+    window.addEventListener('resize', function () {
+        if (!ball) return;
+        stopAutoplay();
+        var lp = getLanding(stepIndex);
+        placeBall(lp.x, lp.y);
+        if (isVisible && !userCtrl) { setTimeout(startAutoplay, 300); }
     });
 
 });
@@ -799,129 +977,83 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /* =====================================================
-   LATEST NEWS — category filter + JS-rendered grid + modal
+   ACCOMPLISHMENTS — swipe carousel
 ===================================================== */
 document.addEventListener('DOMContentLoaded', function () {
 
-    var section = document.getElementById('news');
+    var section = document.getElementById('accomplishments');
     if (!section) return;
 
-    var dataEl   = document.getElementById('newsJson');
-    if (!dataEl) return;
-    var allItems = JSON.parse(dataEl.textContent);
+    var track   = document.getElementById('acTrack');
+    if (!track) return;
 
-    var activeCat = 'All';
-    var overlay   = document.getElementById('newsOverlay');
-    var closeBtn  = document.getElementById('newsDialogClose');
+    var cards   = Array.from(track.querySelectorAll('.ac-card'));
+    var prevBtn = section.querySelector('.ac-prev');
+    var nextBtn = section.querySelector('.ac-next');
+    var dot     = section.querySelector('.ac-progress-dot');
+    var ptrack  = section.querySelector('.ac-progress-track');
 
-    /* ---- placeholder image HTML ---- */
-    function makePh(shot, small) {
-        return '<div class="news-ph" aria-label="Image placeholder: ' + esc(shot) + '" role="img">' +
-            '<span class="news-ph-tag"><i></i>PHOTOGRAPH REQUIRED</span>' +
-            '<span class="news-ph-shot">' + escHtml(shot) + '</span>' +
-        '</div>';
+    /* ----- progress dot ----- */
+    function updateProgress() {
+        var max = track.scrollWidth - track.clientWidth;
+        if (max <= 0 || !dot || !ptrack) return;
+        var pct  = track.scrollLeft / max;
+        var room = ptrack.offsetWidth - 9;
+        dot.style.left = Math.round(pct * room) + 'px';
     }
 
-    /* ---- arrow-right SVG ---- */
-    var arrowSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>';
+    track.addEventListener('scroll', updateProgress, { passive: true });
 
-    /* ---- safe string helpers ---- */
-    function esc(s) {
-        return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
-    function escHtml(s) {
-        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    /* ----- arrow scroll ----- */
+    function scrollCards(dir) {
+        var w = cards[0] ? cards[0].offsetWidth + 16 : 356;
+        track.scrollBy({ left: dir * w, behavior: 'smooth' });
     }
 
-    /* ---- render grid ---- */
-    function renderGrid() {
-        var body  = document.getElementById('newsBody');
-        var items = activeCat === 'All' ? allItems : allItems.filter(function (n) { return n.cat === activeCat; });
+    if (prevBtn) prevBtn.addEventListener('click', function () { scrollCards(-1); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { scrollCards(1); });
 
-        if (!items.length) {
-            body.innerHTML =
-                '<div class="news-empty">' +
-                    '<p>No ' + escHtml(activeCat.toLowerCase()) + ' stories yet.</p>' +
-                    '<button class="link-cta" id="newsShowAll">Show all stories ' + arrowSvg + '</button>' +
-                '</div>';
-            var showAll = document.getElementById('newsShowAll');
-            if (showAll) showAll.addEventListener('click', function () { setFilter('All'); });
-            return;
-        }
-
-        var lead = items[0];
-        var rest = items.slice(1);
-
-        var leadHtml =
-            '<article class="news-lead" tabindex="0" data-cat="' + esc(lead.cat) + '" data-title="' + esc(lead.title) + '" data-shot="' + esc(lead.shot) + '">' +
-                '<div class="news-img">' + makePh(lead.shot) + '</div>' +
-                '<p class="news-meta"><span>' + escHtml(lead.cat) + '</span><span>Date to be confirmed</span></p>' +
-                '<h3>' + escHtml(lead.title) + '</h3>' +
-                '<button class="link-cta" tabindex="-1" aria-hidden="true">Read more ' + arrowSvg + '</button>' +
-            '</article>';
-
-        var restHtml = '';
-        if (rest.length) {
-            var rowsHtml = rest.map(function (n) {
-                return '<article class="news-row" tabindex="0" data-cat="' + esc(n.cat) + '" data-title="' + esc(n.title) + '" data-shot="' + esc(n.shot) + '">' +
-                    '<div class="news-thumb">' + makePh(n.shot, true) + '</div>' +
-                    '<div>' +
-                        '<p class="news-meta"><span>' + escHtml(n.cat) + '</span><span>Date to be confirmed</span></p>' +
-                        '<h4>' + escHtml(n.title) + '</h4>' +
-                    '</div>' +
-                '</article>';
-            }).join('');
-            restHtml = '<div class="news-rest">' + rowsHtml + '</div>';
-        }
-
-        body.innerHTML = '<div class="news-grid">' + leadHtml + restHtml + '</div>';
-
-        /* attach click + keyboard handlers */
-        body.querySelectorAll('.news-lead, .news-row').forEach(function (art) {
-            function open() {
-                openDialog({ cat: art.dataset.cat, title: art.dataset.title, shot: art.dataset.shot });
-            }
-            art.addEventListener('click', open);
-            art.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
-        });
-    }
-
-    /* ---- category filter ---- */
-    function setFilter(cat) {
-        activeCat = cat;
-        section.querySelectorAll('.chips button').forEach(function (btn) {
-            var on = btn.dataset.chip === cat;
-            btn.classList.toggle('on', on);
-            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-        });
-        renderGrid();
-    }
-
-    section.querySelectorAll('.chips button').forEach(function (btn) {
-        btn.addEventListener('click', function () { setFilter(btn.dataset.chip); });
+    /* ----- keyboard on track ----- */
+    track.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { e.preventDefault(); scrollCards(1); }
+        if (e.key === 'ArrowLeft')  { e.preventDefault(); scrollCards(-1); }
     });
 
-    /* ---- modal ---- */
-    function openDialog(item) {
-        document.getElementById('newsDialogImg').innerHTML   = makePh(item.shot);
-        document.getElementById('newsDialogMeta').innerHTML  = '<span>' + escHtml(item.cat) + '</span><span>Date to be confirmed</span>';
-        document.getElementById('newsDialogTitle').textContent = item.title;
-        overlay.hidden = false;
-        document.body.style.overflow = 'hidden';
-        closeBtn.focus();
+    /* ----- mouse drag-to-scroll ----- */
+    var dragging = false, startX = 0, startScroll = 0;
+
+    track.addEventListener('pointerdown', function (e) {
+        if (e.pointerType === 'touch') return;
+        dragging = true;
+        startX = e.clientX;
+        startScroll = track.scrollLeft;
+        track.setPointerCapture(e.pointerId);
+        track.style.cursor = 'grabbing';
+    });
+    track.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        track.scrollLeft = startScroll - (e.clientX - startX);
+    });
+    track.addEventListener('pointerup',     function () { dragging = false; track.style.cursor = ''; });
+    track.addEventListener('pointercancel', function () { dragging = false; track.style.cursor = ''; });
+
+    /* ----- entrance stagger (once) ----- */
+    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!prefersReduced && typeof IntersectionObserver !== 'undefined') {
+        var io = new IntersectionObserver(function (entries) {
+            if (!entries[0].isIntersecting) return;
+            cards.forEach(function (card, i) {
+                setTimeout(function () { card.classList.add('ac-visible'); }, i * 100);
+            });
+            io.disconnect();
+        }, { threshold: 0.1 });
+        io.observe(section);
+    } else {
+        cards.forEach(function (c) { c.classList.add('ac-visible'); });
     }
 
-    function closeDialog() {
-        overlay.hidden = true;
-        document.body.style.overflow = '';
-    }
-
-    closeBtn.addEventListener('click', closeDialog);
-    overlay.addEventListener('click', function (e) { if (e.target === overlay) closeDialog(); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !overlay.hidden) closeDialog(); });
-
-    /* ---- initial render ---- */
-    renderGrid();
+    updateProgress();
 
 });
 

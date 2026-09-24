@@ -98,7 +98,7 @@
 
             <a href="#sustainability">Sustainability</a>
             <a href="#careers">Careers</a>
-            <a href="#news">News</a>
+            <a href="#accomplishments">News</a>
             <a href="#contact">Contact</a>
 
             <a href="#contact" class="talk-button">
@@ -136,7 +136,7 @@
         <a href="#businesses"     style="--d: 50ms"><span>Businesses</span></a>
         <a href="#sustainability" style="--d: 100ms"><span>Sustainability</span></a>
         <a href="#careers"        style="--d: 150ms"><span>Careers</span></a>
-        <a href="#news"           style="--d: 200ms"><span>News</span></a>
+        <a href="#accomplishments" style="--d: 200ms"><span>News</span></a>
         <a href="#contact"        style="--d: 250ms"><span>Contact</span></a>
     </nav>
 
