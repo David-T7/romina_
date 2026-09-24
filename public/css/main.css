@@ -1036,6 +1036,32 @@ button {
 }
 
 
+/* Our story: desktop entrance — nodes fade in when tl-entered is set */
+@media (min-width: 769px) {
+    .tl-rail:not(.tl-entered) .tl-node { opacity: 0; }
+
+    .tl-rail.tl-entered .tl-node {
+        animation: tlNodeIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    .tl-rail.tl-entered .tl-node[data-index="0"] { animation-delay:   0ms; }
+    .tl-rail.tl-entered .tl-node[data-index="1"] { animation-delay: 100ms; }
+    .tl-rail.tl-entered .tl-node[data-index="2"] { animation-delay: 200ms; }
+    .tl-rail.tl-entered .tl-node[data-index="3"] { animation-delay: 300ms; }
+    .tl-rail.tl-entered .tl-node[data-index="4"] { animation-delay: 400ms; }
+}
+
+@keyframes tlNodeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tl-rail:not(.tl-entered) .tl-node { opacity: 1 !important; }
+    .tl-rail.tl-entered .tl-node       { animation: none !important; }
+}
+
+
 /* =====================================================
    Our story: mobile staircase
 ===================================================== */

@@ -150,26 +150,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 /* =====================================================
-   TIMELINE / Our story staircase
+   Our story — timeline autoplay (desktop + mobile staircase)
 ===================================================== */
 document.addEventListener('DOMContentLoaded', function () {
 
-    const TIMELINE = [
-        { year: '1973', text: 'Girma Taye opens a small, cherished restaurant in Arat Kilo, in the heart of Addis Ababa.' },
-        { year: '2009', text: 'Romina Coffee launches, taking Ethiopian Arabica to Europe, the USA, Asia and the Middle East.' },
-        { year: '2017', text: 'A partnership between Jaquar Group and Romina Group opens Jaquar World Addis Ababa.' },
-        { year: '2020', text: 'KOBA Patisserie & Bakery is established, built on craftsmanship and artisan baking.' },
+    var TIMELINE = [
+        { year: '1973',  text: 'Girma Taye opens a small, cherished restaurant in Arat Kilo, in the heart of Addis Ababa.' },
+        { year: '2009',  text: 'Romina Coffee launches, taking Ethiopian Arabica to Europe, the USA, Asia and the Middle East.' },
+        { year: '2017',  text: 'A partnership between Jaquar Group and Romina Group opens Jaquar World Addis Ababa.' },
+        { year: '2020',  text: 'KOBA Patisserie & Bakery is established, built on craftsmanship and artisan baking.' },
         { year: 'Today', text: 'A diversified Ethiopian group spanning hospitality, coffee export, international trading, importing and distribution.' },
     ];
 
-    const nodes  = document.querySelectorAll('.tl-node');
-    const dot    = document.getElementById('tlDot');
-    const detail = document.getElementById('tlDetail');
-    const big    = document.getElementById('tlBig');
-    const text   = document.getElementById('tlText');
-    const rail   = document.querySelector('.tl-rail');
+    var nodes  = document.querySelectorAll('.tl-node');
+    var dot    = document.getElementById('tlDot');
+    var detail = document.getElementById('tlDetail');
+    var big    = document.getElementById('tlBig');
+    var text   = document.getElementById('tlText');
+    var rail   = document.querySelector('.tl-rail');
 
-    if (!nodes.length || !dot || !detail) return;
+    if (!nodes.length || !rail) return;
+
+    var prefRed = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function activate(index) {
         nodes.forEach(function (n, i) {
@@ -178,195 +180,311 @@ document.addEventListener('DOMContentLoaded', function () {
             n.setAttribute('aria-pressed', i === index ? 'true' : 'false');
             n.setAttribute('aria-current', i === index ? 'step' : 'false');
         });
-        dot.style.left = ((index / (TIMELINE.length - 1)) * 100) + '%';
-        detail.classList.remove('tl-animate');
-        void detail.offsetWidth;
-        detail.classList.add('tl-animate');
-        big.textContent  = TIMELINE[index].year;
-        text.textContent = TIMELINE[index].text;
+        if (dot)    dot.style.left = ((index / (TIMELINE.length - 1)) * 100) + '%';
+        if (detail) { detail.classList.remove('tl-animate'); void detail.offsetWidth; detail.classList.add('tl-animate'); }
+        if (big)    big.textContent  = TIMELINE[index].year;
+        if (text)   text.textContent = TIMELINE[index].text;
     }
 
-    var isMobile       = window.matchMedia('(max-width: 768px)').matches;
-    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    /* ================================================================
+       DESKTOP CONTROLLER  (≥769px)
+       Auto-advances every 3 s. Hover pauses; resumes 4 s after leave.
+       Click/keyboard stops; resumes 8 s after last interaction.
+    ================================================================ */
+    function initDesktop() {
+        var autoIdx     = 0;
+        var autoTimer   = null;
+        var resumeTimer = null;
+        var isVisible   = false;
+        var io          = null;
 
-    /* ---- Desktop: hover + click ---- */
-    if (!isMobile) {
+        function schedule() {
+            clearTimeout(autoTimer);
+            if (!isVisible) return;
+            autoTimer = setTimeout(function () {
+                autoIdx = (autoIdx + 1) % TIMELINE.length;
+                activate(autoIdx);
+                schedule();
+            }, 3000);
+        }
+
+        function pause() { clearTimeout(autoTimer); }
+
+        function scheduleResume(ms) {
+            clearTimeout(resumeTimer);
+            clearTimeout(autoTimer);
+            resumeTimer = setTimeout(schedule, ms);
+        }
+
         nodes.forEach(function (node) {
-            node.addEventListener('click',      function () { activate(+node.dataset.index); });
-            node.addEventListener('mouseenter', function () { activate(+node.dataset.index); });
+            var idx = +node.dataset.index;
+
+            /* Hover: pause, show this milestone */
+            node.addEventListener('mouseenter', function () {
+                clearTimeout(resumeTimer);
+                pause();
+                activate(idx);
+                autoIdx = idx;
+            });
+            node.addEventListener('mouseleave', function () { scheduleResume(4000); });
+
+            /* Click: activate + long resume */
+            node.addEventListener('click', function () {
+                activate(idx);
+                autoIdx = idx;
+                scheduleResume(8000);
+            });
+
+            /* Keyboard focus behaves like hover */
+            node.addEventListener('focus', function () {
+                clearTimeout(resumeTimer);
+                pause();
+                activate(idx);
+                autoIdx = idx;
+            });
+            node.addEventListener('blur',  function () { scheduleResume(4000); });
+            node.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    activate(idx);
+                    autoIdx = idx;
+                    scheduleResume(8000);
+                }
+            });
         });
-        if (rail) rail.classList.add('tl-entered');
-        return;
+
+        function onEnter() {
+            isVisible = true;
+            if (!rail.classList.contains('tl-entered')) rail.classList.add('tl-entered');
+            activate(autoIdx);
+            schedule();
+        }
+        function onLeave() { isVisible = false; pause(); }
+
+        if (typeof IntersectionObserver !== 'undefined') {
+            io = new IntersectionObserver(function (entries) {
+                entries[0].isIntersecting ? onEnter() : onLeave();
+            }, { threshold: 0.2 });
+            io.observe(rail);
+        } else {
+            onEnter();
+        }
+
+        return {
+            onVisibility: function (hidden) {
+                if (hidden) pause();
+                else if (isVisible) schedule();
+            },
+            destroy: function () {
+                pause();
+                clearTimeout(resumeTimer);
+                if (io) io.disconnect();
+                rail.classList.remove('tl-entered');
+            }
+        };
     }
 
-    /* ---- Mobile reduced-motion: tap only, no ball ---- */
-    if (prefersReduced) {
-        nodes.forEach(function (node) {
-            node.addEventListener('click', function () { activate(+node.dataset.index); });
-        });
-        if (rail) { rail.classList.add('tl-entered'); activate(0); }
-        return;
-    }
+    /* ================================================================
+       MOBILE CONTROLLER  (≤768px)
+       Ball bounces 1973→…→Today→loop. Tap stops ball; resumes after 8 s.
+    ================================================================ */
+    function initMobile() {
 
-    /* ---- Mobile: bouncing ball autoplay ---- */
-    var ball        = null;   // <span class="tl-ball"> created after entrance anim
-    var ballX       = 0;      // bottom-center x relative to rail
-    var ballY       = 0;      // bottom y relative to rail (= tread line)
-    var stepIndex   = 0;
-    var autoTimer   = null;
-    var entrTimer   = null;
-    var hopRaf      = null;
-    var autoPlaying = false;
-    var userCtrl    = false;
-    var isVisible   = false;
+        /* Reduced motion: instant tap only, no ball */
+        if (prefRed) {
+            nodes.forEach(function (node) {
+                node.addEventListener('click', function () { activate(+node.dataset.index); });
+                node.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(+node.dataset.index); }
+                });
+            });
+            rail.classList.add('tl-entered');
+            activate(0);
+            return { onVisibility: function () {}, destroy: function () {} };
+        }
 
-    /* Landing point: right-top corner of step (tread/riser junction) */
-    function getLanding(i) {
-        var rr = rail.getBoundingClientRect();
-        var nr = nodes[i].getBoundingClientRect();
-        return { x: nr.right - rr.left, y: nr.top - rr.top };
-    }
+        var ball        = null;
+        var ballX = 0, ballY = 0;
+        var stepIndex   = 0;
+        var autoTimer   = null;
+        var resumeTimer = null;
+        var entrTimer   = null;
+        var hopRaf      = null;
+        var autoPlaying = false;
+        var isVisible   = false;
+        var io          = null;
 
-    /* Place ball instantly (bottom-center at x,y) */
-    function placeBall(x, y) {
-        ballX = x; ballY = y;
-        ball.style.transform = 'translate(' + (x - 7) + 'px,' + (y - 14) + 'px)';
-    }
+        /* Landing: right-top corner of each step (tread/riser junction) */
+        function getLanding(i) {
+            var rr = rail.getBoundingClientRect();
+            var nr = nodes[i].getBoundingClientRect();
+            return { x: nr.right - rr.left, y: nr.top - rr.top };
+        }
 
-    function cancelHop() {
-        if (hopRaf) { cancelAnimationFrame(hopRaf); hopRaf = null; }
-    }
-
-    /* Squash on landing using Web Animations API */
-    function squash(x, y) {
-        if (typeof ball.animate !== 'function') return;
-        var p = 'translate(' + (x - 7) + 'px,' + (y - 14) + 'px)';
-        ball.animate(
-            [{ transform: p + ' scaleX(1.15) scaleY(0.8)' }, { transform: p }],
-            { duration: 80, easing: 'ease-out' }
-        );
-    }
-
-    /* Arc hop via requestAnimationFrame */
-    function hopTo(toX, toY, dur, onDone) {
-        cancelHop();
-        var sx = ballX, sy = ballY;
-        var dx = toX - sx, dy = toY - sy;
-        /* Arc height: upward arc regardless of direction, capped for long jumps */
-        var arcH = Math.min(80 + Math.abs(dx) * 0.15 + Math.abs(dy) * 0.1, 100);
-        var t0   = performance.now();
-
-        function tick(now) {
-            var raw  = Math.min((now - t0) / dur, 1);
-            var ease = raw < 0.5 ? 2 * raw * raw : -1 + (4 - 2 * raw) * raw;
-            var x    = sx + dx * ease;
-            var y    = sy + dy * ease - arcH * Math.sin(Math.PI * raw);
+        function placeBall(x, y) {
+            ballX = x; ballY = y;
             ball.style.transform = 'translate(' + (x - 7) + 'px,' + (y - 14) + 'px)';
-            if (raw < 1) {
-                hopRaf = requestAnimationFrame(tick);
-            } else {
-                hopRaf = null;
-                ballX = toX; ballY = toY;
-                squash(toX, toY);
-                if (onDone) onDone();
+        }
+
+        function cancelHop() {
+            if (hopRaf) { cancelAnimationFrame(hopRaf); hopRaf = null; }
+        }
+
+        function squash(x, y) {
+            if (typeof ball.animate !== 'function') return;
+            var p = 'translate(' + (x - 7) + 'px,' + (y - 14) + 'px)';
+            ball.animate(
+                [{ transform: p + ' scaleX(1.15) scaleY(0.8)' }, { transform: p }],
+                { duration: 80, easing: 'ease-out' }
+            );
+        }
+
+        function hopTo(toX, toY, dur, onDone) {
+            cancelHop();
+            var sx = ballX, sy = ballY, dx = toX - sx, dy = toY - sy;
+            var arcH = Math.min(80 + Math.abs(dx) * 0.15 + Math.abs(dy) * 0.1, 100);
+            var t0   = performance.now();
+            (function tick(now) {
+                var raw  = Math.min((now - t0) / dur, 1);
+                var ease = raw < 0.5 ? 2 * raw * raw : -1 + (4 - 2 * raw) * raw;
+                var x    = sx + dx * ease;
+                var y    = sy + dy * ease - arcH * Math.sin(Math.PI * raw);
+                ball.style.transform = 'translate(' + (x - 7) + 'px,' + (y - 14) + 'px)';
+                if (raw < 1) {
+                    hopRaf = requestAnimationFrame(tick);
+                } else {
+                    hopRaf = null; ballX = toX; ballY = toY;
+                    squash(toX, toY);
+                    if (onDone) onDone();
+                }
+            })(performance.now());
+        }
+
+        function moveTo(i, dur, done) {
+            var lp = getLanding(i);
+            hopTo(lp.x, lp.y, dur, function () {
+                activate(i); stepIndex = i;
+                if (done) done();
+            });
+        }
+
+        function scheduleNext() {
+            if (!autoPlaying) return;
+            clearTimeout(autoTimer);
+            autoTimer = setTimeout(function () {
+                if (!autoPlaying) return;
+                moveTo((stepIndex + 1) % TIMELINE.length, 550, scheduleNext);
+            }, 1800);
+        }
+
+        function startAutoplay() {
+            if (autoPlaying || !ball) return;
+            autoPlaying = true;
+            scheduleNext();
+        }
+
+        function stopAutoplay() {
+            autoPlaying = false;
+            clearTimeout(autoTimer);
+            cancelHop();
+        }
+
+        /* Tap: jump to step, then resume autoplay after 8 s */
+        nodes.forEach(function (node) {
+            node.addEventListener('click', function () {
+                var idx = +node.dataset.index;
+                stopAutoplay();
+                clearTimeout(resumeTimer);
+                if (ball) moveTo(idx, 300, null);
+                else { activate(idx); stepIndex = idx; }
+                resumeTimer = setTimeout(startAutoplay, 8000);
+            });
+            node.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); node.click(); }
+            });
+        });
+
+        function onEnter() {
+            isVisible = true;
+            if (!rail.classList.contains('tl-entered')) {
+                rail.classList.add('tl-entered');
+                /* Wait out entrance animation (320ms delay + 500ms duration) */
+                entrTimer = setTimeout(function () {
+                    ball = document.createElement('span');
+                    ball.className = 'tl-ball';
+                    ball.setAttribute('aria-hidden', 'true');
+                    rail.appendChild(ball);
+                    rail.classList.add('tl-has-ball');
+                    var lp = getLanding(0);
+                    placeBall(lp.x, lp.y);
+                    activate(0); stepIndex = 0;
+                    startAutoplay();
+                }, 860);
+            } else if (ball) {
+                startAutoplay();
             }
         }
-        hopRaf = requestAnimationFrame(tick);
-    }
 
-    /* Hop ball to step i, then activate it */
-    function moveTo(i, dur, done) {
-        var lp = getLanding(i);
-        hopTo(lp.x, lp.y, dur, function () {
-            activate(i);
-            stepIndex = i;
-            if (done) done();
-        });
-    }
-
-    function scheduleNext() {
-        if (!autoPlaying) return;
-        clearTimeout(autoTimer);
-        autoTimer = setTimeout(function () {
-            if (!autoPlaying) return;
-            moveTo((stepIndex + 1) % TIMELINE.length, 550, scheduleNext);
-        }, 1600);
-    }
-
-    function startAutoplay() {
-        if (autoPlaying || !ball) return;
-        autoPlaying = true;
-        scheduleNext();
-    }
-
-    function stopAutoplay() {
-        autoPlaying = false;
-        clearTimeout(autoTimer);
-        cancelHop();
-    }
-
-    /* Tap: hand control to user */
-    nodes.forEach(function (node) {
-        node.addEventListener('click', function () {
-            var idx = +node.dataset.index;
+        function onLeave() {
+            isVisible = false;
+            clearTimeout(entrTimer);
             stopAutoplay();
-            userCtrl = true;
-            if (ball) moveTo(idx, 300, null);
-            else { activate(idx); stepIndex = idx; }
-        });
-    });
-
-    /* Enter viewport: run entrance anim, then create ball and start autoplay */
-    function onEnter() {
-        isVisible = true;
-        if (!rail.classList.contains('tl-entered')) {
-            rail.classList.add('tl-entered');
-            /* Wait for last step's entrance anim: 320ms delay + 500ms = 820ms */
-            entrTimer = setTimeout(function () {
-                ball = document.createElement('span');
-                ball.className = 'tl-ball';
-                ball.setAttribute('aria-hidden', 'true');
-                rail.appendChild(ball);
-                rail.classList.add('tl-has-ball');
-                var lp = getLanding(0);
-                placeBall(lp.x, lp.y);
-                activate(0);
-                stepIndex = 0;
-                if (!userCtrl) startAutoplay();
-            }, 860);
-        } else if (ball && !userCtrl) {
-            startAutoplay();
         }
+
+        if (typeof IntersectionObserver !== 'undefined') {
+            io = new IntersectionObserver(function (entries) {
+                entries[0].isIntersecting ? onEnter() : onLeave();
+            }, { threshold: 0.15 });
+            io.observe(rail);
+        } else {
+            rail.classList.add('tl-entered');
+        }
+
+        window.addEventListener('resize', function () {
+            if (!ball) return;
+            stopAutoplay();
+            placeBall(getLanding(stepIndex).x, getLanding(stepIndex).y);
+            if (isVisible) setTimeout(startAutoplay, 300);
+        });
+
+        return {
+            onVisibility: function (hidden) {
+                if (hidden) stopAutoplay();
+                else if (isVisible) startAutoplay();
+            },
+            destroy: function () {
+                stopAutoplay();
+                clearTimeout(entrTimer);
+                clearTimeout(resumeTimer);
+                if (io) io.disconnect();
+                if (ball && ball.parentNode) { ball.parentNode.removeChild(ball); ball = null; }
+                rail.classList.remove('tl-entered', 'tl-has-ball');
+            }
+        };
     }
 
-    function onLeave() {
-        isVisible = false;
-        clearTimeout(entrTimer);
-        stopAutoplay();
+    /* ================================================================
+       BOOTSTRAP — one controller at a time, hot-swap on breakpoint cross
+    ================================================================ */
+    var mq   = window.matchMedia('(max-width: 768px)');
+    var ctrl = null;
+
+    function boot() {
+        if (ctrl) ctrl.destroy();
+        ctrl = mq.matches ? initMobile() : initDesktop();
     }
 
-    if (typeof IntersectionObserver !== 'undefined') {
-        var io = new IntersectionObserver(function (entries) {
-            if (entries[0].isIntersecting) onEnter(); else onLeave();
-        }, { threshold: 0.15 });
-        io.observe(rail);
+    /* addEventListener preferred; addListener is the legacy Safari fallback */
+    if (typeof mq.addEventListener === 'function') {
+        mq.addEventListener('change', boot);
     } else {
-        rail.classList.add('tl-entered');
+        mq.addListener(boot);
     }
 
-    /* Pause when tab loses focus */
-    document.addEventListener('visibilitychange', function () {
-        if (document.hidden) { stopAutoplay(); }
-        else if (isVisible && !userCtrl) { startAutoplay(); }
-    });
+    boot();
 
-    /* Reposition ball on resize */
-    window.addEventListener('resize', function () {
-        if (!ball) return;
-        stopAutoplay();
-        var lp = getLanding(stepIndex);
-        placeBall(lp.x, lp.y);
-        if (isVisible && !userCtrl) { setTimeout(startAutoplay, 300); }
+    document.addEventListener('visibilitychange', function () {
+        if (ctrl) ctrl.onVisibility(document.hidden);
     });
 
 });
