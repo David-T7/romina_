@@ -984,6 +984,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }, { passive: true });
     update();
 }());
+
+
+/* =====================================================
+   HEADER SCROLL STATE
+===================================================== */
+(function () {
+    var hdr = document.querySelector('.site-header');
+    if (!hdr) return;
+    function updateHeader() { hdr.classList.toggle('is-scrolled', window.scrollY > 60); }
+    window.addEventListener('scroll', updateHeader, { passive: true });
+    updateHeader();
+}());
 </script>
 
 </body>

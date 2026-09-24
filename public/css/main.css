@@ -13,6 +13,7 @@
 
     --container: 1380px;
     --transition: 0.45s cubic-bezier(.2,.8,.2,1);
+    --section-space: clamp(3.5rem, 7vw, 7rem);
 }
 
 
@@ -109,6 +110,30 @@ button {
     font-weight: 800;
     letter-spacing: 4px;
 }
+
+
+/* Logo dual-state: white by default (transparent header over dark hero) */
+.logo-white { display: block; }
+.logo-navy  { display: none; }
+
+/* Scrolled state — solid white header */
+.site-header.is-scrolled {
+    position: fixed;
+    background: #fff;
+    box-shadow: 0 2px 20px rgba(0,0,0,.12);
+    border-bottom-color: rgba(0,0,0,.08);
+}
+
+.site-header.is-scrolled .logo-white { display: none; }
+.site-header.is-scrolled .logo-navy  { display: block; }
+
+.site-header.is-scrolled .main-navigation > a,
+.site-header.is-scrolled .dropdown-trigger { color: #0E2240; }
+
+.site-header.is-scrolled .main-navigation > a:hover,
+.site-header.is-scrolled .dropdown-trigger:hover { color: #0E2240; }
+
+.site-header.is-scrolled .mobile-menu-button { color: #0E2240; }
 
 
 /* Navigation */
@@ -1184,6 +1209,10 @@ button {
     font-size: 18px;
     line-height: 1.8;
 }
+
+/* Ensure .mark labels inside sustainability sections stay navy on white bg */
+.sustainability-section .mark,
+.sustainability-details .mark { color: #0E2240; }
 
 
 .outline-button {
@@ -2405,7 +2434,7 @@ button {
 
 .values-section {
     background: #F2F4F7;
-    padding: clamp(88px, 12vw, 168px) 0;
+    padding-block: var(--section-space);
 }
 
 .values-section .mark {
@@ -4595,7 +4624,7 @@ button {
 
     background: #ffffff;
     color: var(--text);
-    padding: 110px 24px;
+    padding: var(--section-space) 24px;
     font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
       Roboto, Helvetica, Arial, sans-serif;
   }
@@ -4869,7 +4898,7 @@ button {
 
   @media (max-width: 700px) {
     .sustainability-section {
-      padding: 75px 20px;
+      padding-inline: 20px;
     }
 
     .sustainability-header h2 {
@@ -4984,7 +5013,7 @@ button {
     --warm: #fdfaf8;
 
     background: #ffffff;
-    padding: 100px 24px 120px;
+    padding: var(--section-space) 24px;
     font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
       Roboto, Helvetica, Arial, sans-serif;
   }
@@ -6008,7 +6037,7 @@ button {
 }
 
 /* section backgrounds */
-.sec       { padding: clamp(88px,12vw,168px) 0; }
+.sec       { padding-block: var(--section-space); }
 .brands    { transition: background-color .7s cubic-bezier(.16,1,.3,1), color .7s cubic-bezier(.16,1,.3,1); }
 .brands.tone-light { background: #fff; }
 .brands.tone-paper { background: #F2F4F7; }
@@ -6270,7 +6299,7 @@ button {
 
 .careers {
     background: #E8132C;
-    padding: clamp(88px, 11vw, 140px) 0;
+    padding-block: var(--section-space);
 }
 
 .careers-grid {
@@ -6332,8 +6361,10 @@ button {
 }
 
 @media (max-width: 600px) {
-    .careers { padding: 72px 0; }
+    /* careers padding handled by --section-space clamp */
 }
+
+.careers .mark i { background: #071b3a; }
 
 
 /* =====================================================

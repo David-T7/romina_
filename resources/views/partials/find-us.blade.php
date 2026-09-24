@@ -160,7 +160,7 @@
    FIND US — Section wrapper
 ============================================================ */
 .find-us-section {
-    padding: 100px 0 0;
+    padding: var(--section-space) 0;
     background: #0a0a0a;
 }
 
@@ -200,7 +200,6 @@
 ============================================================ */
 .find-us-panel {
     display: flex;
-    border-radius: 16px;
     overflow: hidden;
     box-shadow:
         0 24px 72px rgba(0, 0, 0, 0.6),
@@ -469,7 +468,7 @@
    RESPONSIVE
 ============================================================ */
 @media (max-width: 900px) {
-    .find-us-section { padding: 72px 0 0; }
+    .find-us-section { padding: var(--section-space) 0; }
     .find-us-container { padding: 0 20px; }
 
     .find-us-panel {

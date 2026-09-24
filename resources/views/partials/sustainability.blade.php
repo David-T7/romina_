@@ -22,7 +22,11 @@
 
     <div class="impact-header">
       <div>
-        <span class="impact-eyebrow">Our Impact</span>
+        <div class="mark">
+          <span class="mark-rule"></span>
+          <i></i>
+          Our Impact
+        </div>
         <h3>By the Numbers</h3>
       </div>
 
@@ -190,7 +194,11 @@ $approach_items = [
   <div class="details-container">
 
     <div class="details-heading sa-reveal">
-      <span class="details-label">Our Approach</span>
+      <div class="mark">
+        <span class="mark-rule"></span>
+        <i></i>
+        Our Approach
+      </div>
       <h2>Rooted in Responsibility</h2>
       <p>
         Our sustainability programme connects responsible sourcing, farmer

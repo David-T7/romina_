@@ -3,7 +3,8 @@
 
         <!-- Logo -->
         <a href="/" class="logo">
-            <img src="{{ asset('images/logo/logo-white.png') }}" alt="">
+            <img src="{{ asset('images/logo/logo-romina-white.svg') }}" class="logo-white" width="160" height="50" alt="Romina Group">
+            <img src="{{ asset('images/logo/logo-romina.svg') }}"       class="logo-navy"  width="160" height="50" alt="Romina Group">
         </a>
 
         <!-- Desktop Navigation -->
@@ -123,7 +124,7 @@
 
     <div class="container mobile-nav-top">
         <a href="/" class="logo">
-            <img src="{{ asset('images/logo/logo-white.png') }}" alt="Romina Group">
+            <img src="{{ asset('images/logo/logo-romina-white.svg') }}" width="160" height="50" alt="Romina Group">
         </a>
         <button class="mobile-nav-close" id="menuClose" aria-label="Close menu">
             <i class="fa-solid fa-xmark"></i>

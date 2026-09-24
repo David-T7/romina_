@@ -6,9 +6,10 @@
         <div class="container">
 
             <div class="ftr-top">
-                <img src="{{ asset('images/logo/logo-white.png') }}"
+                <img src="{{ asset('images/logo/logo-romina-white.svg') }}"
                      alt="Romina, since 1973"
-                     class="ftr-logo">
+                     class="ftr-logo"
+                     width="160" height="50">
                 <span class="ftr-divider" aria-hidden="true"><b></b><i></i><b></b></span>
             </div>
 
