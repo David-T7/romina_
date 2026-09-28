@@ -20,9 +20,6 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-<<<<<<< HEAD
-    <link rel="stylesheet" href="{{ asset('css/main.css') }}?v={{ filemtime(public_path('css/main.css')) }}">
-=======
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
 
     @yield('page-css')
@@ -36,7 +33,6 @@
     @endphp
     <script>window.I18N={!! json_encode(['en'=>$i18nEn,'am'=>$i18nAm],JSON_UNESCAPED_UNICODE|JSON_HEX_TAG) !!};window.I18N_LOCALE='{{ app()->getLocale() }}';</script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
->>>>>>> development
 </head>
 
 <body>
