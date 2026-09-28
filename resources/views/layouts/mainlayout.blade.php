@@ -1,16 +1,16 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"{{ app()->getLocale() === 'am' ? ' class="lang-am"' : '' }}>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Romina Group</title>
+    <title>{{ $pageTitle ?? 'Romina Group' }}</title>
 
-    <!-- Google Font -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;500;700&family=Roboto:wght@300;400;500;700;900&display=swap"
         rel="stylesheet"
     >
 
@@ -20,48 +20,40 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
+<<<<<<< HEAD
     <link rel="stylesheet" href="{{ asset('css/main.css') }}?v={{ filemtime(public_path('css/main.css')) }}">
+=======
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+
+    @yield('page-css')
+
+    @php
+        $i18nEn   = trans('site', [], 'en');
+        $i18nAm   = trans('site', [], 'am');
+        $i18nYear = date('Y');
+        if (isset($i18nEn['ftr_copyright'])) $i18nEn['ftr_copyright'] = str_replace(':year', $i18nYear, $i18nEn['ftr_copyright']);
+        if (isset($i18nAm['ftr_copyright'])) $i18nAm['ftr_copyright'] = str_replace(':year', $i18nYear, $i18nAm['ftr_copyright']);
+    @endphp
+    <script>window.I18N={!! json_encode(['en'=>$i18nEn,'am'=>$i18nAm],JSON_UNESCAPED_UNICODE|JSON_HEX_TAG) !!};window.I18N_LOCALE='{{ app()->getLocale() }}';</script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+>>>>>>> development
 </head>
 
 <body>
+
+@include('partials.romina-intro')
+
+{{-- Romina Assistant chatbot — global, coordinates with intro overlay --}}
+@include('partials.romina-chatbot')
 
 <div class="scroll-prog" aria-hidden="true"><i></i></div>
 
 @include('partials.header')
 
+
 <main>
 
-@include('partials.hero')
-
-@include('partials.about')
-
-@include('partials.who-we-are')
-
-@include('partials.portfolio')
-
-@include('partials.values')
-
-@include('partials.reviews')
-
-@include('partials.brands-tabs')
-
-@include('partials.coffee')
-
-@include('partials.executive-team')
-
-@include('partials.businesses')
-
-@include('partials.news')
-
-@include('partials.sustainability')
-
-@include('partials.partners')
-
-@include('partials.careers')
-
-@include('partials.contact')
-
-@include('partials.find-us')
+@yield('page-content')
 
 @include('partials.footer')
 
@@ -154,13 +146,18 @@ document.addEventListener('DOMContentLoaded', function () {
 ===================================================== */
 document.addEventListener('DOMContentLoaded', function () {
 
-    var TIMELINE = [
-        { year: '1973',  text: 'Girma Taye opens a small, cherished restaurant in Arat Kilo, in the heart of Addis Ababa.' },
-        { year: '2009',  text: 'Romina Coffee launches, taking Ethiopian Arabica to Europe, the USA, Asia and the Middle East.' },
-        { year: '2017',  text: 'A partnership between Jaquar Group and Romina Group opens Jaquar World Addis Ababa.' },
-        { year: '2020',  text: 'KOBA Patisserie & Bakery is established, built on craftsmanship and artisan baking.' },
-        { year: 'Today', text: 'A diversified Ethiopian group spanning hospitality, coffee export, international trading, importing and distribution.' },
-    ];
+    function getTlData(locale) {
+        var L = window.I18N && (window.I18N[locale] || window.I18N['en']) || {};
+        return [
+            { year: '1973',              text: L['tl_0_text'] || '' },
+            { year: '2009',              text: L['tl_1_text'] || '' },
+            { year: '2017',              text: L['tl_2_text'] || '' },
+            { year: '2020',              text: L['tl_3_text'] || '' },
+            { year: L['tl_4_year'] || 'Today', text: L['tl_4_text'] || '' },
+        ];
+    }
+    var TIMELINE    = getTlData(window.I18N_LOCALE || document.documentElement.lang || 'en');
+    var tlActiveIdx = 0;
 
     var nodes  = document.querySelectorAll('.tl-node');
     var dot    = document.getElementById('tlDot');
@@ -174,13 +171,17 @@ document.addEventListener('DOMContentLoaded', function () {
     var prefRed = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function activate(index) {
+        tlActiveIdx = index;
         nodes.forEach(function (n, i) {
             n.classList.toggle('on',   i === index);
             n.classList.toggle('past', i < index);
             n.setAttribute('aria-pressed', i === index ? 'true' : 'false');
             n.setAttribute('aria-current', i === index ? 'step' : 'false');
         });
-        if (dot)    dot.style.left = ((index / (TIMELINE.length - 1)) * 100) + '%';
+        if (dot) {
+            var p = window.innerWidth >= 1024 ? nodes[index].style.getPropertyValue('--pos').trim() : '';
+            dot.style.left = p || ((index / (TIMELINE.length - 1)) * 100) + '%';
+        }
         if (detail) { detail.classList.remove('tl-animate'); void detail.offsetWidth; detail.classList.add('tl-animate'); }
         if (big)    big.textContent  = TIMELINE[index].year;
         if (text)   text.textContent = TIMELINE[index].text;
@@ -487,6 +488,19 @@ document.addEventListener('DOMContentLoaded', function () {
         if (ctrl) ctrl.onVisibility(document.hidden);
     });
 
+    document.addEventListener('localechange', function (e) {
+        TIMELINE = getTlData(e.detail.locale);
+        activate(tlActiveIdx);
+        /* Also update tl-node title spans */
+        nodes.forEach(function (n, i) {
+            var span = n.querySelector('.tl-title');
+            if (span && span.dataset.i18n) {
+                var val = window.I18N && window.I18N[e.detail.locale] && window.I18N[e.detail.locale][span.dataset.i18n];
+                if (val != null) span.textContent = val;
+            }
+        });
+    });
+
 });
 
 
@@ -501,6 +515,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const currentNumber  = document.querySelector('.current-slide');
     const progressActive = document.querySelector('.progress-active');
     const progressDot    = document.querySelector('.progress-dot');
+
+    if (!slides.length || !nextButton || !prevButton) return;
 
     let current = 0;
     let autoplay;
@@ -635,13 +651,18 @@ document.addEventListener('DOMContentLoaded', () => {
 ===================================================== */
 document.addEventListener('DOMContentLoaded', function () {
 
-    var VALUES = [
-        { name: 'Excellence',   text: 'Striving for superior performance and quality in everything we undertake.' },
-        { name: 'Innovation',   text: 'Committed to continuous creativity and adapting to stay ahead of the curve and the competition.' },
-        { name: 'Quality',      text: 'Providing our customers with the highest standard of products and services available.' },
-        { name: 'Sustainability', text: 'Operating in an environmentally friendly way, protecting our resources for future generations.' },
-        { name: 'Integrity',    text: 'Conducting our business with unwavering honesty, transparency and ethical standards.' }
-    ];
+    function getValData(locale) {
+        var L = window.I18N && (window.I18N[locale] || window.I18N['en']) || {};
+        return [
+            { name: L['val_0_name'] || 'Excellence',   text: L['val_0_text'] || '' },
+            { name: L['val_1_name'] || 'Innovation',   text: L['val_1_text'] || '' },
+            { name: L['val_2_name'] || 'Quality',      text: L['val_2_text'] || '' },
+            { name: L['val_3_name'] || 'Sustainability', text: L['val_3_text'] || '' },
+            { name: L['val_4_name'] || 'Integrity',    text: L['val_4_text'] || '' },
+        ];
+    }
+    var VALUES      = getValData(window.I18N_LOCALE || document.documentElement.lang || 'en');
+    var valActiveIdx = 0;
 
     var items   = document.querySelectorAll('.val-list li');
     var card    = document.getElementById('valCard');
@@ -651,6 +672,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!items.length || !card) return;
 
     function activate(index) {
+        valActiveIdx = index;
         items.forEach(function (li, i) {
             li.classList.toggle('on', i === index);
             li.querySelector('button').setAttribute('aria-expanded', i === index ? 'true' : 'false');
@@ -670,6 +692,11 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.addEventListener('click',      function () { activate(i); });
         btn.addEventListener('mouseenter', function () { activate(i); });
         btn.addEventListener('focus',      function () { activate(i); });
+    });
+
+    document.addEventListener('localechange', function (e) {
+        VALUES = getValData(e.detail.locale);
+        activate(valActiveIdx);
     });
 
 });
@@ -723,6 +750,322 @@ document.addEventListener('DOMContentLoaded', function () {
             obs.unobserve(statsEl);
         }, { threshold: 0.15 }).observe(statsEl);
     }
+
+});
+
+
+/* =====================================================
+   Coffee legacy video
+===================================================== */
+document.addEventListener('DOMContentLoaded', function () {
+    'use strict';
+
+    var vid      = document.getElementById('cofBgVideo');
+    var beans    = document.querySelector('.cof-beans');
+    if (!vid || !beans) return;
+
+    var centerBtn = document.getElementById('cofCenterBtn');
+    var controls  = document.getElementById('cofControls');
+    var ctrlPlay  = document.getElementById('cofCtrlPlay');
+    var ctrlRew   = document.getElementById('cofCtrlRew');
+    var ctrlFwd   = document.getElementById('cofCtrlFwd');
+    var timeEl    = document.getElementById('cofTime');
+    var seekWrap  = document.getElementById('cofSeekWrap');
+    var seekBuf   = document.getElementById('cofSeekBuf');
+    var seekPlayed= document.getElementById('cofSeekPlayed');
+    var seekTip   = document.getElementById('cofSeekTip');
+    var speedBtn  = document.getElementById('cofSpeedBtn');
+    var speedMenu = document.getElementById('cofSpeedMenu');
+    var muteBtn   = document.getElementById('cofCtrlMute');
+    var volSlider = document.getElementById('cofVolSlider');
+    var fsBtn     = document.getElementById('cofCtrlFs');
+
+    /* ---- Accessibility / performance ---- */
+    var prefRed  = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var saveData = !!(typeof navigator.connection !== 'undefined' && navigator.connection.saveData);
+    if (prefRed)  beans.classList.add('no-pulse');
+    if (saveData) vid.preload = 'none';
+
+    /* ---- Mobile source swap (before first metadata load) ---- */
+    if (window.matchMedia('(max-width: 768px)').matches && vid.dataset.mobileSrc) {
+        vid.querySelectorAll('source').forEach(function (s) { s.remove(); });
+        var ms = document.createElement('source');
+        ms.src  = vid.dataset.mobileSrc;
+        ms.type = 'video/mp4';
+        vid.appendChild(ms);
+        vid.load();
+    }
+
+    beans.setAttribute('tabindex', '0');
+
+    /* ---- Helpers ---- */
+    var hideTimer  = null;
+    var isDragging = false;
+
+    function fmtTime(s) {
+        if (!isFinite(s) || isNaN(s)) return '0:00';
+        var m  = Math.floor(s / 60);
+        var ss = Math.floor(s % 60);
+        return m + ':' + (ss < 10 ? '0' : '') + ss;
+    }
+
+    function getSeekFrac(e) {
+        if (!seekWrap) return 0;
+        var r  = seekWrap.getBoundingClientRect();
+        var cx = (e.touches && e.touches.length) ? e.touches[0].clientX : e.clientX;
+        return Math.max(0, Math.min(1, (cx - r.left) / r.width));
+    }
+
+    /* ---- Icon helpers ---- */
+    var vidState = 'play';   /* track for localechange */
+
+    function vidStr(key) {
+        var loc = window.I18N_LOCALE || document.documentElement.lang || 'en';
+        return (window.I18N && window.I18N[loc] && window.I18N[loc][key]) || key;
+    }
+
+    function setPlayIcons(state) {
+        vidState = state;
+        [centerBtn, ctrlPlay].forEach(function (btn) {
+            if (!btn) return;
+            ['play', 'pause', 'replay'].forEach(function (s) {
+                var el = btn.querySelector('.icon-' + s);
+                if (el) el.style.display = (s === state) ? '' : 'none';
+            });
+        });
+        if (centerBtn) centerBtn.setAttribute('aria-label',
+            state === 'replay' ? vidStr('vid_replay') : state === 'pause' ? vidStr('vid_pause') : vidStr('vid_play'));
+        if (ctrlPlay) ctrlPlay.setAttribute('aria-label', state === 'pause' ? vidStr('vid_pause_ctrl') : vidStr('vid_play_ctrl'));
+    }
+
+    function setMuteIcons() {
+        var m = vid.muted || vid.volume === 0;
+        if (muteBtn) {
+            var iv = muteBtn.querySelector('.icon-vol');
+            var im = muteBtn.querySelector('.icon-muted');
+            if (iv) iv.style.display = m ? 'none' : '';
+            if (im) im.style.display = m ? '' : 'none';
+            muteBtn.setAttribute('aria-label', m ? vidStr('vid_unmute') : vidStr('vid_mute'));
+        }
+        if (volSlider) volSlider.value = (vid.muted ? 0 : vid.volume).toString();
+    }
+
+    function setFsIcons() {
+        var inFs = !!document.fullscreenElement;
+        if (fsBtn) {
+            var ifs  = fsBtn.querySelector('.icon-fs');
+            var iefs = fsBtn.querySelector('.icon-exit-fs');
+            if (ifs)  ifs.style.display  = inFs ? 'none' : '';
+            if (iefs) iefs.style.display = inFs ? '' : 'none';
+            fsBtn.setAttribute('aria-label', inFs ? vidStr('vid_exit_fullscreen') : vidStr('vid_fullscreen'));
+        }
+    }
+
+    /* ---- Controls visibility ---- */
+    function showControls() {
+        clearTimeout(hideTimer);
+        beans.classList.add('controls-visible');
+        if (!vid.paused && !vid.ended) {
+            hideTimer = setTimeout(function () {
+                beans.classList.remove('controls-visible');
+            }, 2500);
+        }
+    }
+
+    /* ---- Timeline ---- */
+    function updateTimeline() {
+        var dur = vid.duration;
+        var pct = dur ? vid.currentTime / dur * 100 : 0;
+        if (seekPlayed) seekPlayed.style.width = pct + '%';
+        if (seekBuf && vid.buffered.length) {
+            seekBuf.style.width = (vid.buffered.end(vid.buffered.length - 1) / (dur || 1) * 100) + '%';
+        }
+        if (timeEl) timeEl.textContent = fmtTime(vid.currentTime) + ' / ' + fmtTime(dur);
+    }
+
+    /* ---- Play / pause ---- */
+    function doPlay()  { vid.play().catch(function () {}); }
+    function doPause() { vid.pause(); }
+    function togglePlay() {
+        if (vid.ended) { vid.currentTime = 0; doPlay(); }
+        else if (vid.paused) doPlay();
+        else doPause();
+    }
+
+    /* ---- Video events drive UI state ---- */
+    vid.addEventListener('play', function () {
+        beans.classList.add('is-playing');
+        beans.classList.remove('is-ended');
+        setPlayIcons('pause');
+        showControls();
+    });
+    vid.addEventListener('pause', function () {
+        if (vid.ended) return;
+        beans.classList.remove('is-playing');
+        setPlayIcons('play');
+        clearTimeout(hideTimer);
+        beans.classList.add('controls-visible');
+    });
+    vid.addEventListener('ended', function () {
+        beans.classList.remove('is-playing');
+        beans.classList.add('is-ended');
+        setPlayIcons('replay');
+        clearTimeout(hideTimer);
+        beans.classList.add('controls-visible');
+    });
+    vid.addEventListener('timeupdate',     updateTimeline);
+    vid.addEventListener('seeked',         updateTimeline);
+    vid.addEventListener('progress',       updateTimeline);
+    vid.addEventListener('loadedmetadata', updateTimeline);
+    vid.addEventListener('durationchange', updateTimeline);
+
+    /* ---- Click targets ---- */
+    if (centerBtn) centerBtn.addEventListener('click', function (e) { togglePlay(); e.stopPropagation(); });
+    if (ctrlPlay)  ctrlPlay.addEventListener('click',  function (e) { togglePlay(); e.stopPropagation(); });
+    beans.addEventListener('click', function (e) {
+        if (controls  && controls.contains(e.target))  return;
+        if (centerBtn && centerBtn.contains(e.target)) return;
+        togglePlay();
+    });
+
+    /* ---- Rewind / Forward ---- */
+    if (ctrlRew) ctrlRew.addEventListener('click', function (e) {
+        vid.currentTime = Math.max(0, vid.currentTime - 10);
+        updateTimeline(); showControls(); e.stopPropagation();
+    });
+    if (ctrlFwd) ctrlFwd.addEventListener('click', function (e) {
+        vid.currentTime = Math.min(vid.duration || 0, vid.currentTime + 10);
+        updateTimeline(); showControls(); e.stopPropagation();
+    });
+
+    /* ---- Seek (mouse + touch) ---- */
+    if (seekWrap) {
+        seekWrap.addEventListener('mousedown', function (e) {
+            isDragging = true;
+            if (isFinite(vid.duration)) vid.currentTime = getSeekFrac(e) * vid.duration;
+            updateTimeline(); showControls(); e.stopPropagation();
+        });
+        seekWrap.addEventListener('mousemove', function (e) {
+            if (!seekTip) return;
+            var r    = seekWrap.getBoundingClientRect();
+            var x    = e.clientX - r.left;
+            seekTip.textContent  = fmtTime(getSeekFrac(e) * (vid.duration || 0));
+            seekTip.style.left   = Math.max(18, Math.min(r.width - 18, x)) + 'px';
+            seekTip.style.opacity = '1';
+        });
+        seekWrap.addEventListener('mouseleave', function () {
+            if (seekTip) seekTip.style.opacity = '0';
+        });
+        seekWrap.addEventListener('touchstart', function (e) {
+            isDragging = true;
+            if (isFinite(vid.duration)) vid.currentTime = getSeekFrac(e) * vid.duration;
+            updateTimeline(); showControls(); e.stopPropagation();
+        }, { passive: true });
+    }
+    document.addEventListener('mousemove', function (e) {
+        if (!isDragging) return;
+        if (isFinite(vid.duration)) vid.currentTime = getSeekFrac(e) * vid.duration;
+        updateTimeline();
+    });
+    document.addEventListener('mouseup',   function () { isDragging = false; });
+    document.addEventListener('touchmove', function (e) {
+        if (!isDragging) return;
+        if (isFinite(vid.duration)) vid.currentTime = getSeekFrac(e) * vid.duration;
+        updateTimeline();
+    }, { passive: true });
+    document.addEventListener('touchend',  function () { isDragging = false; });
+
+    /* ---- Speed ---- */
+    if (speedBtn && speedMenu) {
+        speedBtn.addEventListener('click', function (e) {
+            var open = speedMenu.classList.toggle('is-open');
+            speedBtn.setAttribute('aria-expanded', String(open));
+            showControls(); e.stopPropagation();
+        });
+        speedMenu.querySelectorAll('[data-speed]').forEach(function (item) {
+            item.addEventListener('click', function (e) {
+                var spd = parseFloat(item.dataset.speed);
+                vid.playbackRate = spd;
+                speedBtn.textContent = (spd === 1 ? '1' : spd) + '×';
+                speedMenu.querySelectorAll('[data-speed]').forEach(function (i) { i.classList.remove('active'); });
+                item.classList.add('active');
+                speedMenu.classList.remove('is-open');
+                speedBtn.setAttribute('aria-expanded', 'false');
+                showControls(); e.stopPropagation();
+            });
+        });
+        document.addEventListener('click', function () {
+            if (speedMenu.classList.contains('is-open')) {
+                speedMenu.classList.remove('is-open');
+                speedBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    /* ---- Mute / Volume ---- */
+    if (muteBtn) muteBtn.addEventListener('click', function (e) {
+        vid.muted = !vid.muted; setMuteIcons(); showControls(); e.stopPropagation();
+    });
+    if (volSlider) volSlider.addEventListener('input', function (e) {
+        vid.volume = parseFloat(volSlider.value);
+        vid.muted  = (vid.volume === 0);
+        setMuteIcons(); showControls(); e.stopPropagation();
+    });
+
+    /* ---- Fullscreen ---- */
+    if (fsBtn) fsBtn.addEventListener('click', function (e) {
+        if (!document.fullscreenElement) beans.requestFullscreen && beans.requestFullscreen();
+        else document.exitFullscreen && document.exitFullscreen();
+        showControls(); e.stopPropagation();
+    });
+    document.addEventListener('fullscreenchange', setFsIcons);
+
+    /* ---- Controls auto-show on hover / tap ---- */
+    beans.addEventListener('mousemove',  showControls);
+    beans.addEventListener('touchstart', showControls, { passive: true });
+
+    /* ---- IntersectionObserver: pause only when scrolled out ---- */
+    if (typeof IntersectionObserver !== 'undefined') {
+        new IntersectionObserver(function (entries) {
+            if (!entries[0].isIntersecting && !vid.paused) doPause();
+        }, { threshold: 0.1 }).observe(beans);
+    }
+
+    /* ---- Tab visibility ---- */
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden && !vid.paused) doPause();
+    });
+
+    /* ---- Locale change: refresh aria-labels ---- */
+    document.addEventListener('localechange', function () {
+        setPlayIcons(vidState);
+        setMuteIcons();
+        setFsIcons();
+    });
+
+    /* ---- Keyboard (Space/K play-pause, J/← rwd, L/→ fwd, M mute, F fullscreen) ---- */
+    beans.addEventListener('keydown', function (e) {
+        if (e.target.tagName === 'INPUT') return;
+        switch (e.key) {
+            case ' ': case 'k': case 'K':
+                e.preventDefault(); togglePlay(); showControls(); break;
+            case 'j': case 'J': case 'ArrowLeft':
+                e.preventDefault();
+                vid.currentTime = Math.max(0, vid.currentTime - 10);
+                updateTimeline(); showControls(); break;
+            case 'l': case 'L': case 'ArrowRight':
+                e.preventDefault();
+                vid.currentTime = Math.min(vid.duration || 0, vid.currentTime + 10);
+                updateTimeline(); showControls(); break;
+            case 'm': case 'M':
+                e.preventDefault(); vid.muted = !vid.muted; setMuteIcons(); showControls(); break;
+            case 'f': case 'F':
+                e.preventDefault();
+                if (!document.fullscreenElement) beans.requestFullscreen && beans.requestFullscreen();
+                else document.exitFullscreen && document.exitFullscreen();
+                break;
+        }
+    });
 
 });
 
@@ -813,23 +1156,26 @@ document.addEventListener("DOMContentLoaded", function () {
     const section = document.querySelector("#executive-team");
     if (!section) return;
 
+    /* Each grid reveals on its own as it scrolls into view */
+    const grids = section.querySelectorAll(".executive-team-grid");
+
     if ("IntersectionObserver" in window) {
 
         const observer = new IntersectionObserver(
             function (entries, observer) {
                 entries.forEach(function (entry) {
                     if (!entry.isIntersecting) return;
-                    section.classList.add("is-visible");
+                    entry.target.classList.add("is-visible");
                     observer.unobserve(entry.target);
                 });
             },
             { threshold: 0.12, rootMargin: "0px 0px -70px 0px" }
         );
 
-        observer.observe(section);
+        grids.forEach(function (grid) { observer.observe(grid); });
 
     } else {
-        section.classList.add("is-visible");
+        grids.forEach(function (grid) { grid.classList.add("is-visible"); });
     }
 
 });
@@ -841,6 +1187,7 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener("DOMContentLoaded", function () {
 
     const section  = document.querySelector("#sustainability");
+    if (!section) return;
     const counters = section.querySelectorAll(".counter");
     let hasAnimated = false;
 
@@ -886,63 +1233,44 @@ document.addEventListener("DOMContentLoaded", function () {
 ===================================================== */
 (function () {
 
-    function initApproachAccordion() {
-        var section = document.querySelector('.sustainability-details');
-        if (!section) return;
-        var items = section.querySelectorAll('.accordion-item');
-
-        items.forEach(function (item) {
-            var trigger = item.querySelector('.accordion-trigger');
-            if (!trigger) return;
-
-            trigger.addEventListener('click', function () {
-                var isActive = item.classList.contains('active');
-
-                items.forEach(function (other) {
-                    other.classList.remove('active');
-                    var t = other.querySelector('.accordion-trigger');
-                    if (t) t.setAttribute('aria-expanded', 'false');
-                });
-
-                if (!isActive) {
-                    item.classList.add('active');
-                    trigger.setAttribute('aria-expanded', 'true');
-                }
-            });
-        });
-    }
-
+    /* Heading + photo tiles fade up as they enter; "Read More" is a plain
+       anchor link, so the jump to each detail block needs no JS. */
     function initApproachReveal() {
         var section = document.querySelector('.sustainability-details');
         if (!section) return;
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
         var header = section.querySelector('.sa-reveal');
-        var rows   = section.querySelectorAll('.accordion-reveal');
+        var tiles  = section.querySelectorAll('.appr-reveal');
+        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (reduced || typeof IntersectionObserver === 'undefined') {
+            if (header) header.classList.add('revealed');
+            tiles.forEach(function (tile) { tile.classList.add('revealed'); });
+            return;
+        }
 
         var observer = new IntersectionObserver(function (entries) {
             entries.forEach(function (entry) {
                 if (!entry.isIntersecting) return;
-                entry.target.classList.add('revealed');
-                observer.unobserve(entry.target);
+                var el = entry.target;
+                el.classList.add('revealed');
+                observer.unobserve(el);
+                /* Drop the stagger once in, so the hover dim responds instantly */
+                setTimeout(function () { el.style.transitionDelay = ''; }, 1200);
             });
         }, { threshold: 0.12 });
 
         if (header) observer.observe(header);
 
-        rows.forEach(function (row, i) {
-            row.style.transitionDelay = (i * 55) + 'ms';
-            observer.observe(row);
+        tiles.forEach(function (tile, i) {
+            tile.style.transitionDelay = ((i % 3) * 110) + 'ms';   /* cascade per row */
+            observer.observe(tile);
         });
     }
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function () {
-            initApproachAccordion();
-            initApproachReveal();
-        });
+        document.addEventListener('DOMContentLoaded', initApproachReveal);
     } else {
-        initApproachAccordion();
         initApproachReveal();
     }
 
@@ -1184,6 +1512,11 @@ document.addEventListener('DOMContentLoaded', function () {
         var status = document.getElementById('ctcStatus');
         if (!form || !status) return;
 
+        function fStr(key) {
+            var loc = window.I18N_LOCALE || document.documentElement.lang || 'en';
+            return (window.I18N && window.I18N[loc] && window.I18N[loc][key]) || key;
+        }
+
         form.addEventListener('submit', function (e) {
             e.preventDefault();
 
@@ -1192,13 +1525,13 @@ document.addEventListener('DOMContentLoaded', function () {
             var message = (form.querySelector('[name="message"]').value || '').trim();
 
             if (!name || !email || !message) {
-                status.textContent   = 'Add your name, email and message, then send again.';
+                status.textContent   = fStr('form_err_required');
                 status.className     = 'f-status err';
                 status.style.display = 'block';
                 return;
             }
 
-            status.textContent   = "Form preview: this form isn't connected to an inbox yet. Email info@rominaplc.com in the meantime.";
+            status.textContent   = fStr('form_preview_msg');
             status.className     = 'f-status';
             status.style.display = 'block';
         });
@@ -1210,6 +1543,75 @@ document.addEventListener('DOMContentLoaded', function () {
         initContactForm();
     }
 }());
+
+
+/* =====================================================
+   OUR STORY — reveal + 3D tilt
+   Pointer position drives --rx/--ry (tilt) and --gx/--gy
+   (glare). Tilt only on fine pointers with motion allowed.
+===================================================== */
+document.addEventListener('DOMContentLoaded', function () {
+
+    var cards = document.querySelectorAll('.story [data-tilt]');
+    if (!cards.length) return;
+
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* Entrance */
+    var reveals = document.querySelectorAll('.story-reveal');
+    if (reduced || typeof IntersectionObserver === 'undefined') {
+        reveals.forEach(function (el) { el.classList.add('revealed'); });
+    } else {
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('revealed');
+                io.unobserve(entry.target);
+            });
+        }, { threshold: 0.15 });
+
+        reveals.forEach(function (el, i) {
+            el.style.transitionDelay = (i * 160) + 'ms';
+            io.observe(el);
+            /* Clear the stagger after entry so the tilt stays responsive */
+            setTimeout(function () { el.style.transitionDelay = ''; }, 2000);
+        });
+    }
+
+    /* Tilt */
+    var canTilt = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (reduced || !canTilt) return;
+
+    var MAX_Y = 10;   /* degrees, left-right */
+    var MAX_X = 7;    /* degrees, up-down */
+
+    cards.forEach(function (card) {
+        var raf = 0;
+
+        card.addEventListener('pointermove', function (e) {
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(function () {
+                var r  = card.getBoundingClientRect();
+                var px = (e.clientX - r.left) / r.width;
+                var py = (e.clientY - r.top)  / r.height;
+
+                card.classList.add('is-tilting');
+                card.style.setProperty('--ry', ((px - 0.5) * MAX_Y).toFixed(2) + 'deg');
+                card.style.setProperty('--rx', ((0.5 - py) * MAX_X).toFixed(2) + 'deg');
+                card.style.setProperty('--gx', (px * 100).toFixed(1) + '%');
+                card.style.setProperty('--gy', (py * 100).toFixed(1) + '%');
+            });
+        });
+
+        card.addEventListener('pointerleave', function () {
+            cancelAnimationFrame(raf);
+            card.classList.remove('is-tilting');
+            card.style.setProperty('--ry', '0deg');
+            card.style.setProperty('--rx', '0deg');
+        });
+    });
+
+});
 
 
 /* =====================================================
@@ -1246,7 +1648,95 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener('scroll', updateHeader, { passive: true });
     updateHeader();
 }());
+
+
+/* =====================================================
+   LANG SWITCHER — instant client-side swap
+===================================================== */
+(function () {
+    'use strict';
+
+    var CSRF     = (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
+    var postBase = '/lang/';
+
+    function lookup(locale, key) {
+        var dict = window.I18N && window.I18N[locale];
+        return (dict && dict[key] != null) ? dict[key] : null;
+    }
+
+    function applyLocale(locale) {
+        var prev = window.I18N_LOCALE || document.documentElement.lang || 'en';
+        if (locale === prev || !window.I18N || !window.I18N[locale]) return;
+
+        /* — text nodes — */
+        document.querySelectorAll('[data-i18n]').forEach(function (el) {
+            var val = lookup(locale, el.dataset.i18n);
+            if (val != null) el.textContent = val;
+        });
+
+        /* — trusted HTML (our own <br>/<strong> strings only) — */
+        document.querySelectorAll('[data-i18n-html]').forEach(function (el) {
+            var val = lookup(locale, el.dataset.i18nHtml);
+            if (val != null) el.innerHTML = val;
+        });
+
+        /* — attributes (format: "attr:key" or "attr:key;attr2:key2") — */
+        document.querySelectorAll('[data-i18n-attr]').forEach(function (el) {
+            el.dataset.i18nAttr.split(';').forEach(function (pair) {
+                var sep  = pair.indexOf(':');
+                if (sep < 1) return;
+                var attr = pair.slice(0, sep).trim();
+                var key  = pair.slice(sep + 1).trim();
+                var val  = lookup(locale, key);
+                if (val != null) el.setAttribute(attr, val);
+            });
+        });
+
+        /* — <html lang> + Amharic font class — */
+        document.documentElement.lang = locale;
+        document.documentElement.classList.toggle('lang-am', locale === 'am');
+
+        /* — switcher active states — */
+        document.querySelectorAll('[data-locale]').forEach(function (a) {
+            var on = a.dataset.locale === locale;
+            a.classList.toggle('lang-opt--on',        on);
+            a.classList.toggle('mobile-lang-opt--on', on);
+        });
+
+        /* — update global tracker — */
+        window.I18N_LOCALE = locale;
+
+        /* — notify dynamic components — */
+        document.dispatchEvent(new CustomEvent('localechange', {
+            detail: { locale: locale, prev: prev }
+        }));
+
+        /* — persist (fire-and-forget; GET link is the no-JS fallback) — */
+        if (typeof fetch !== 'undefined') {
+            fetch(postBase + locale, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN':    CSRF,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            }).catch(function () {});
+        }
+    }
+
+    document.addEventListener('click', function (e) {
+        var a = e.target.closest('[data-locale]');
+        if (!a) return;
+        e.preventDefault();
+        var locale = a.dataset.locale;
+        if (!locale) return;
+        applyLocale(locale);
+        a.focus();   /* keep keyboard focus on the switcher */
+    });
+
+}());
 </script>
+
+@yield('page-js')
 
 </body>
 </html>
